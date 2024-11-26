@@ -19,7 +19,7 @@ class BlogController extends Controller
                'message' => 'blogs return successfully',
                 'status' => 200,
                 'data' => $blogs->items(),
-               'meta' => [
+                'meta' => [
                    'total' => $blogs->total(),
                    'current_page' => $blogs->currentPage(),
                    'last_page' => $blogs->lastPage(),

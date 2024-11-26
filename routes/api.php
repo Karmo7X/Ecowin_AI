@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\api\BlogController;
+use App\Http\Controllers\api\CategoryController;
 use App\Http\Controllers\api\ContactController;
 use App\Http\Controllers\api\QuestionController;
 use Illuminate\Http\Request;
@@ -11,6 +12,9 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 
+
+// api routes for categories
+Route::get('/categories', [CategoryController::class, 'index']);
 
 // api routes for blogs
 
