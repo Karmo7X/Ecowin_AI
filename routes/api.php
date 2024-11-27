@@ -5,24 +5,42 @@ use App\Http\Controllers\api\ContactController;
 use App\Http\Controllers\api\QuestionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ResetPassController;
+use App\Http\Controllers\PasswordController;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+Route::group([], function () {
+    // Public routes (No Authentication Required)
+    Route::post('register', [AuthController::class, 'register']);
+    Route::post('login', [AuthController::class, 'login']);
+    Route::post('send-otp', [PasswordController::class, 'sendOtp']);
+    Route::post('forget-password', [PasswordController::class, 'forgetPassword']);
 
+    // Public API routes (Accessible by everyone)
+    Route::get('/blogs', [BlogController::class, 'index']);
+    Route::get('/blogs/{id}', [BlogController::class, 'show']);
+    Route::post('contact', [ContactController::class, 'store']);
+    Route::get('/questions', [QuestionController::class, 'index']);
+    Route::post('/search_questions', [QuestionController::class, 'search']);
+});
 
+// Protected Routes for Any Authenticated User (No Role Required)
+Route::group(['middleware' => ['auth:api']], function () {
+    Route::post('/reset-password', [ResetPassController::class, 'resetPassword']);
+    Route::post('logout', [AuthController::class, 'logout']);
+});
 
-// api routes for blogs
+// Routes accessible by users only
+Route::group(['middleware' => ['auth:api', 'role:user']], function () {
+    // Users specific routes here...
+});
 
-Route::get('/blogs',[BlogController::class,'index']);
-Route::get('/blogs/{id}',[BlogController::class,'show']);
+// Agent routes (For Agents Only)
+Route::group(['middleware' => ['auth:api', 'role:agent']], function () {
+    // Agent specific routes here...
+});
 
-// api routes for contact
-Route::post('contact',[ContactController::class,'store']);
-
-
-
-// api routes for question (F.A.Q)
-
-Route::get('/questions',[QuestionController::class,'index']);
-Route::post('/search_questions',[QuestionController::class,'search']);
+// Admin routes (For Admins Only)
+Route::group(['middleware' => ['auth:api', 'role:admin']], function () {
+    // Admins specific routes here...
+});
