@@ -1,10 +1,12 @@
 <?php
 
 use App\Http\Controllers\api\BlogController;
+use App\Http\Controllers\api\CategoryController;
 use App\Http\Controllers\api\ContactController;
 use App\Http\Controllers\api\QuestionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ResetPassController;
 use App\Http\Controllers\PasswordController;
@@ -44,3 +46,4 @@ Route::group(['middleware' => ['auth:api', 'role:agent']], function () {
 Route::group(['middleware' => ['auth:api', 'role:admin']], function () {
     // Admins specific routes here...
 });
+
