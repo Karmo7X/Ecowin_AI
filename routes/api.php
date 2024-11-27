@@ -1,15 +1,12 @@
 <?php
 
+use App\Http\Controllers\api\AuthController;
 use App\Http\Controllers\api\BlogController;
-use App\Http\Controllers\api\CategoryController;
 use App\Http\Controllers\api\ContactController;
+use App\Http\Controllers\api\PasswordController;
 use App\Http\Controllers\api\QuestionController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\api\ResetPassController;
 use Illuminate\Support\Facades\Route;
-
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\ResetPassController;
-use App\Http\Controllers\PasswordController;
 
 Route::group([], function () {
     // Public routes (No Authentication Required)
