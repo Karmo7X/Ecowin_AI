@@ -25,8 +25,9 @@ class AuthController extends Controller
         $token = JWTAuth::fromUser($user);
 
         return response()->json([
+            'status' => 201,
             'message' => 'User registered successfully',
-            'user' => $user,
+//            'user' => $user,
             'token'=>$token,
         ], 201);
     }
@@ -44,9 +45,11 @@ class AuthController extends Controller
     }
 
      return response()->json([
+         'status' => 201,
+         'message'=> "user logged in successfuly",
         'token' => $token,
-        'user' => auth('api')->user(),
-        'message'=> "user logged in successfuly"
+//        'user' => auth('api')->user(),
+
       ],201);
     }
 public function logout(Request $request)
@@ -55,6 +58,7 @@ public function logout(Request $request)
             JWTAuth::invalidate(JWTAuth::getToken());
 
             return response()->json([
+                'status' => 200,
                 'message' => 'User logged out successfully',
             ], 200);
         } catch (JWTException $e) {
