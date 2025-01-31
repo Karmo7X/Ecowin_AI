@@ -52,6 +52,15 @@ class AuthController extends Controller
 
       ],201);
     }
+
+    public function GetProfile(Request $request)
+    {
+        return response()->json([
+            'status' => 200,
+            'message'=> "user return successfully",
+            'user' => auth('api')->user()
+        ]);
+    }
 public function logout(Request $request)
     {
         try {

@@ -38,6 +38,7 @@ class BlogController extends Controller
         $blog=Blog::find($id);
         if(!$blog){
            return response()->json([
+               'status' => 404,
                'message' => 'blog return not found',
            ],404);
         }else{

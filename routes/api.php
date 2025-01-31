@@ -29,8 +29,9 @@ Route::group([], function () {
 
 // Protected Routes for Any Authenticated User (No Role Required)
 Route::group(['middleware' => ['auth:api']], function () {
+    Route::get('/get_profile', [AuthController::class, 'GetProfile']);
     Route::post('/reset-password', [ResetPassController::class, 'resetPassword']);
-    Route::post('logout', [AuthController::class, 'logout']);
+    Route::post('/logout', [AuthController::class, 'logout']);
 });
 
 // Routes accessible by users only
