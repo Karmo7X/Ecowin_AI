@@ -15,7 +15,9 @@ class CategoryController extends Controller
     public function index(Request $request)
     {
         $perpage = $request->input('perpage', 10);
-        $categories = Category::paginate($perpage);
+        // Get the requested language (default to English)
+
+        $categories = Category::select('id', 'name_' . app()->getLocale(). ' as name', 'image')->paginate($perpage);
         return response()->json([
             'message' => 'blogs return successfully',
             'status' => 200,

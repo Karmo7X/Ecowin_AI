@@ -17,14 +17,7 @@ Route::group([], function () {
     Route::post('send-otp', [PasswordController::class, 'sendOtp']);
     Route::post('forget-password', [PasswordController::class, 'forgetPassword']);
 
-    // Public API routes (Accessible by everyone)
-    Route::get('/blogs', [BlogController::class, 'index']);
-    Route::get('/blogs/{id}', [BlogController::class, 'show']);
 
-    Route::post('contact', [ContactController::class, 'store']);
-    // questions api
-    Route::get('/questions', [QuestionController::class, 'index']);
-    Route::get('/question_search', [QuestionController::class, 'question_search']);
 });
 
 // Protected Routes for Any Authenticated User (No Role Required)
@@ -35,8 +28,18 @@ Route::group(['middleware' => ['auth:api']], function () {
 });
 
 // Routes accessible by users only
-Route::group(['middleware' => ['auth:api', 'role:user']], function () {
+Route::group(['middleware' => ['auth:api','changelanguage','role:user']], function () {
     // Users specific routes here...
+
+    Route::get('/blogs', [BlogController::class, 'index']);
+    Route::get('/blogs/{id}', [BlogController::class, 'show']);
+
+    Route::post('contact', [ContactController::class, 'store']);
+    // questions api
+    Route::get('/questions', [QuestionController::class, 'index']);
+    Route::get('/question_search', [QuestionController::class, 'question_search']);
+
+
     //category api
     Route::get('/categories', [CategoryController::class, 'index']);
     // products api
