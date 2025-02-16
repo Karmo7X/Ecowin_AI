@@ -12,14 +12,16 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Storage;
 
 class CategoryResource extends Resource
 {
     protected static ?string $model = Category::class;
-    protected static ?string $navigationIcon = 'heroicon-o-tag';
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-group'; // أيقونة التصنيفات
     protected static ?int $navigationSort = 1;
-    protected static ?string $navigationGroup = 'Shop'; // group products under shop 
-    protected static ?string $navigationLabel = 'category'; //change the products name 
+    protected static ?string $navigationGroup = 'Store'; // المجموعة التي تضم التصنيفات والمنتجات
+    protected static ?string $navigationLabel = 'Categories'; // اسم الفئات في القائمة
+
 
     public static function form(Form $form): Form
     {
@@ -30,11 +32,10 @@ class CategoryResource extends Resource
                         Forms\Components\Section::make()
                             ->schema([
                                 Forms\Components\TextInput::make("name")->required(),
-                                Forms\Components\FileUpload::make("image")->directory("form-attachments")->preserveFilenames()->image()->imageEditor()->required(),
+                                Forms\Components\FileUpload::make('image')
+                                    ->directory('categories')
+                                    ->image()->visibility('public')->imageEditor(),
                             ])
-
-
-
                     ])->columnSpan("full")
 
 
@@ -46,6 +47,7 @@ class CategoryResource extends Resource
     {
         return $table
             ->columns([
+
                 Tables\Columns\ImageColumn::make("image"),
                 Tables\Columns\TextColumn::make("name")->searchable()->sortable(),
                 //
