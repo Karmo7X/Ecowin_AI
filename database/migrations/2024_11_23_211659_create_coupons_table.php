@@ -16,7 +16,8 @@ return new class extends Migration
             $table->string('code')->unique();
             $table->decimal('discount_value', 10, 2);
             $table->decimal('price', 10, 2);
-            $table->string('brand');
+            $table->string('brand_ar');
+            $table->string('brand_en');
             $table->unsignedBigInteger('user_id');
             $table->timestamps();
 

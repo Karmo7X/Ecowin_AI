@@ -15,10 +15,16 @@ class Changelanguages
      */
     public function handle(Request $request, Closure $next): Response
     {
-        app()->setLocale('en');
-        if (isset($request->lang) && $request->lang == 'ar') {
-            app()->setLocale('ar');
+        // Check if 'lang' exists in query parameters or headers
+        $lang = $request->query('lang', $request->header('Accept-Language'));
+
+        // Set the application's locale
+        if (in_array($lang, ['en', 'ar'])) {
+            app()->setLocale($lang);
+        } else {
+            app()->setLocale('en'); // Default to English
         }
+
         return $next($request);
     }
 }
