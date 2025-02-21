@@ -13,9 +13,16 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Storage;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\ForceDeleteAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
+use Filament\Tables\Actions\Action;
+use Filament\Actions;
 
 class CategoryResource extends Resource
 {
+    protected static string $resource = UserResource::class;
+
     protected static ?string $model = Category::class;
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-group'; // أيقونة التصنيفات
     protected static ?int $navigationSort = 1;
@@ -31,10 +38,13 @@ class CategoryResource extends Resource
                     ->schema([
                         Forms\Components\Section::make()
                             ->schema([
-                                Forms\Components\TextInput::make("name")->required(),
+                                Forms\Components\TextInput::make("name_ar")->maxValue(50)->required(),
+                                Forms\Components\TextInput::make("name_en")->maxValue(50)->required(),
                                 Forms\Components\FileUpload::make('image')
                                     ->directory('categories')
-                                    ->image()->visibility('public')->imageEditor(),
+                                    ->image()
+                                    ->visibility('public')
+                                    ->imageEditor(),
                             ])
                     ])->columnSpan("full")
 
@@ -49,13 +59,15 @@ class CategoryResource extends Resource
             ->columns([
 
                 Tables\Columns\ImageColumn::make("image"),
-                Tables\Columns\TextColumn::make("name")->searchable()->sortable(),
+                Tables\Columns\TextColumn::make("name_ar")->searchable()->sortable(),
+                Tables\Columns\TextColumn::make("name_en")->searchable()->sortable(),
                 //
             ])
             ->filters([
                 //
             ])
             ->actions([
+
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\EditAction::make(),
@@ -64,7 +76,7 @@ class CategoryResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\ForceDeleteBulkAction::make(),
                 ]),
             ])
             ->emptyStateActions([

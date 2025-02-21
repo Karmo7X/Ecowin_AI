@@ -10,8 +10,10 @@ class Blog extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'title',
-        'body',
+        'title_ar',
+        'title_en',
+        'body_ar',
+        'body_en',
         'image',
     ];
     protected static function boot()

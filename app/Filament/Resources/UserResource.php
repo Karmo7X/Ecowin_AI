@@ -44,10 +44,6 @@ class UserResource extends Resource
                     ->required()
                     ->dehydrateStateUsing(fn($state) => Hash::make($state)),
 
-                Forms\Components\TextInput::make('phone')
-                    ->label('Phone')
-                    ->required()
-                    ->maxLength(20),
 
                 Forms\Components\Select::make("role")->options([
                     "user" => EnumsUserRoleEnum::USER->value,
@@ -69,7 +65,6 @@ class UserResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')->label('Name')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('email')->label('Email')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('phone')->label('Phone')->sortable(),
                 Tables\Columns\TextColumn::make('role')->label('Role')->sortable(),
                 Tables\Columns\TextColumn::make('created_at')->label('Created At')->date(),
                 //

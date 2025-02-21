@@ -26,19 +26,27 @@ class BlogResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('title')
-                    ->label('Title')
+                Forms\Components\TextInput::make('title_ar')
+                    ->label('Title ar')
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('title_en')
+                    ->label('Title en')
                     ->required()
                     ->maxLength(255),
 
-                Forms\Components\Textarea::make('body')
-                    ->label('Content')
+                Forms\Components\Textarea::make('body_ar')
+                    ->label('Content ar')
+                    ->required(),
+                Forms\Components\Textarea::make('body_en')
+                    ->label('Content en')
                     ->required(),
 
                 Forms\Components\FileUpload::make('image')
                     ->label('Image')
-                    ->image()
+                    ->image()->imageEditor()
                     ->directory('blogs')
+                    ->visibility('public')
                     ->nullable(),
                 //
             ]);
@@ -48,8 +56,10 @@ class BlogResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('title')->label('Title')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('body')->label('Content')->limit(50),
+                Tables\Columns\TextColumn::make('title_ar')->label('Title ar')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('title_en')->label('Title en')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('body_ar')->label('Content ar')->limit(50),
+                Tables\Columns\TextColumn::make('body_en')->label('Content en')->limit(50),
                 Tables\Columns\ImageColumn::make('image'),
                 Tables\Columns\TextColumn::make('created_at')->label('Created At')->date(),
                 //
