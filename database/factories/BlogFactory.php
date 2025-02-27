@@ -20,8 +20,10 @@ class BlogFactory extends Factory
     public function definition(): array
     {
         return [
-            'title' => $this->faker->sentence,
-            'body' => $this->faker->paragraph,
+            'title_ar' => $this->faker->sentence,
+            'title_en' => $this->faker->sentence,
+            'body_ar' => $this->faker->paragraph,
+            'body_en' => $this->faker->paragraph,
             'image' => $this->faker->imageUrl(640, 480, 'blog', true, 'Faker'), // Fake image URL
         ];
     }

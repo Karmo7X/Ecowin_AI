@@ -16,7 +16,8 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->string('password');
-            $table->string('phone')->nullable()->change();
+            $table->string('phone')->nullable();
+            $table->string('image')->nullable();
             $table->enum('role', ['user', 'agent', 'admin'])->default('user');
             $table->string('otp')->nullable();
             $table->timestamp('otp_expired_at')->nullable();
