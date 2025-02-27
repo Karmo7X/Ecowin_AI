@@ -8,6 +8,7 @@ use App\Http\Controllers\api\QuestionController;
 use App\Http\Controllers\api\ResetPassController;
 use \App\Http\Controllers\api\ProudctController;
 use \App\Http\Controllers\api\CategoryController;
+use \App\Http\Controllers\api\CartController;
 use Illuminate\Support\Facades\Route;
 
 Route::group([], function () {
@@ -23,6 +24,7 @@ Route::group([], function () {
 // Protected Routes for Any Authenticated User (No Role Required)
 Route::group(['middleware' => ['auth:api']], function () {
     Route::get('/get_profile', [AuthController::class, 'GetProfile']);
+    Route::post('/edit_profile', [AuthController::class, 'EditProfile']);
     Route::post('/reset-password', [ResetPassController::class, 'resetPassword']);
     Route::post('/logout', [AuthController::class, 'logout']);
 });
@@ -38,12 +40,13 @@ Route::group(['middleware' => ['auth:api','changelanguage','role:user']], functi
     // questions api
     Route::get('/questions', [QuestionController::class, 'index']);
     Route::get('/question_search', [QuestionController::class, 'question_search']);
-
-
     //category api
     Route::get('/categories', [CategoryController::class, 'index']);
     // products api
     Route::get('/products', [ProudctController::class, 'index']);
+    // cart api
+    Route::post('/add_to_cart', [CartController::class, 'store']);
+
 
 });
 
