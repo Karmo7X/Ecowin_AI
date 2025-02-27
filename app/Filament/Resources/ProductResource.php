@@ -17,10 +17,11 @@ class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-bolt';
-    protected static ?int $navigationSort = 0;
-    protected static ?string $navigationGroup = 'Shop'; // group products under shop 
-    protected static ?string $navigationLabel = 'Product'; //change the products name 
+    protected static ?string $navigationIcon = 'heroicon-o-shopping-cart'; // أيقونة عربة التسوق تناسب المنتجات
+    protected static ?int $navigationSort = 2;
+    protected static ?string $navigationGroup = 'Store'; // نفس المجموعة لتجميع المنتجات والفئات معًا
+    protected static ?string $navigationLabel = 'Products'; // تصحيح التسمية لتكون بصيغة الجمع
+
 
 
     public static function form(Form $form): Form
@@ -29,10 +30,13 @@ class ProductResource extends Resource
             ->schema([
 
                 Forms\Components\Section::make()->schema([
-                    Forms\Components\FileUpload::make("image")->directory("form-attachments")->preserveFilenames()->image()->imageEditor()->required(),
-                    Forms\Components\TextInput::make("name")->maxValue(50)->required(),
+                    Forms\Components\FileUpload::make("image")->directory("products")->image()->imageEditor()->required(),
+                    Forms\Components\TextInput::make("name_ar")->maxValue(50)->required(),
+                    Forms\Components\TextInput::make("name_en")->maxValue(50)->required(),
                     Forms\Components\Select::make("category_id")
-                        ->relationship('category', "name"),
+                        ->relationship('category', "name_ar")->label("category ar"),
+                    Forms\Components\Select::make("category_id")
+                        ->relationship('category', "name_en")->label("category en"),
                     Forms\Components\TextInput::make("price")->numeric()->required(),
                 ])
             ]);
@@ -43,12 +47,16 @@ class ProductResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\ImageColumn::make("image"),
-                Tables\Columns\TextColumn::make("name")->searchable()->sortable(),
-                Tables\Columns\TextColumn::make("category.name")->searchable()->sortable()->toggleable(),
+                Tables\Columns\TextColumn::make("name_ar")->searchable()->sortable(),
+                Tables\Columns\TextColumn::make("name_en")->searchable()->sortable(),
+                Tables\Columns\TextColumn::make("category.name_ar")->searchable()->sortable()->toggleable(),
+                Tables\Columns\TextColumn::make("category.name_en")->searchable()->sortable()->toggleable(),
                 Tables\Columns\TextColumn::make("price")->sortable()->toggleable(),
                 //
             ])
             ->filters([
+                Tables\Filters\SelectFilter::make("category")->relationship("category", "name_ar"),
+                Tables\Filters\SelectFilter::make("category")->relationship("category", "name_en")
 
                 //
             ])
