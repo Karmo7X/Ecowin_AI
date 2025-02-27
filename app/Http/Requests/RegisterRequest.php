@@ -37,13 +37,12 @@ class RegisterRequest extends FormRequest
 
     'email.required' => 'The email is a required field.',
     'email.email' => 'Please enter a valid email address.',
-    'email.unique' => 'The email you entered is already in the database.',
+    'email.unique' => 'This email is already registered. Please use a different email.',
 
     'password.required' => 'The password is a required field.',
     'password.string' => 'The password must be a string.',
     'password.min' => 'The password must be at least 6 characters.',
     'password.confirmed' => 'The password and password confirmation do not match.',
-
     'phone.required' => 'The phone number is a required field.',
     ];
  }

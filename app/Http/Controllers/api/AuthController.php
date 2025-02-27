@@ -8,6 +8,8 @@ use App\Http\Requests\RegisterRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -55,11 +57,67 @@ class AuthController extends Controller
 
     public function GetProfile(Request $request)
     {
+        $user = auth('api')->user();
+
+        if (!$user) {
+            return response()->json([
+                'status' => 401,
+                'message' => "Unauthorized"
+            ], 401);
+        }
+
+        // إضافة رابط الصورة الكامل
+        $user->image = $user->image ? asset('storage/' . $user->image) : null;
+
         return response()->json([
             'status' => 200,
-            'message'=> "user return successfully",
-            'user' => auth('api')->user()
+            'message' => "User retrieved successfully",
+            'user' => $user
         ]);
+    }
+
+
+    public  function EditProfile(Request $request)
+    {
+// استرجاع المستخدم من الـ JWT
+        $user = JWTAuth::user();
+
+        // التحقق من البيانات المدخلة
+        $validator = Validator::make($request->all(), [
+            'name' => 'sometimes|string|max:255',
+            'email' => 'sometimes|email|unique:users,email,' . $user->id,
+            'phone' => 'sometimes|regex:/^01[0125][0-9]{8}$/',
+            'image' => 'sometimes|image|mimes:jpeg,png,jpg,gif|max:2048'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // تحديث البيانات إذا كانت موجودة في الطلب
+        if ($request->has('name')) $user->name = $request->name;
+        if ($request->has('email')) $user->email = $request->email;
+        if ($request->has('phone')) $user->phone = $request->phone;
+
+        // تحديث الصورة الشخصية
+        if ($request->hasFile('image')) {
+            // حذف الصورة القديمة إن وجدت
+            if ($user->image) {
+                Storage::disk('public')->delete($user->image);
+            }
+
+            // حفظ الصورة الجديدة
+            $path = $request->file('image')->store('profile_images', 'public');
+            $user->image = $path;
+        }
+
+        // حفظ التغييرات
+        $user->save();
+        $user->image = $user->image ? asset('storage/' . $user->image) : null;
+        return response()->json([
+            'message' => 'Profile updated successfully!',
+            'user' => $user
+        ], 200);
     }
 public function logout(Request $request)
     {
