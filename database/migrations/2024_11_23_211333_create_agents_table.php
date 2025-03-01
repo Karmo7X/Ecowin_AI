@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('agents', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('user_id')->constrained()->onDelete('cascade');
             $table->string('assigned_area');
             $table->unsignedBigInteger('order_id')->nullable();
             $table->timestamps();

@@ -31,6 +31,18 @@ class User extends Authenticatable implements
         'phone',
         'role',
     ];
+    protected $appends = ['image_url'];
+
+public function getImageUrlAttribute()
+{
+    if (!empty($this->image)) {
+        return url('storage/' . $this->image);
+    }
+
+    return url('/images/default-avatar.png');
+}
+
+
 
     public function canAccessPanel(Panel $panel): bool
     {
@@ -69,9 +81,43 @@ class User extends Authenticatable implements
         return $this->getKey();
     }
 
-    // إرجاع البيانات المخصصة للـ JWT
+
     public function getJWTCustomClaims()
     {
         return [];
+    }
+     public function wallet()
+    {
+        return $this->hasOne(Wallet::class);
+    }
+
+    public function addresses()
+    {
+        return $this->hasMany(Address::class);
+    }
+
+    public function cart()
+    {
+        return $this->hasOne(Cart::class);
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
+    public function coupons()
+    {
+        return $this->hasMany(Coupon::class);
+    }
+
+    public function agent()
+    {
+        return $this->hasOne(Agent::class);
     }
 }

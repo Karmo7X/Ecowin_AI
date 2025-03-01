@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Order extends Model
 {
     use HasFactory;
+    protected $attributes = [
+        'status' => 'pending',
+    ];
     protected $fillable=['user_id', 'agent_id', 'address_id', 'points', 'status'];
 
     public function user(){
@@ -18,6 +21,10 @@ class Order extends Model
     }
     public function items()
     {
-          return $this->hasMany(Order_item::class);
+        return $this->hasMany(Order_item::class, 'order_id');
+    }
+    public function address()
+    {
+        return $this->belongsTo(Address::class);
     }
 }
