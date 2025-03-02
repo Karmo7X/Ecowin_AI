@@ -9,6 +9,8 @@ use App\Http\Controllers\api\ResetPassController;
 use \App\Http\Controllers\api\ProudctController;
 use \App\Http\Controllers\api\CategoryController;
 use \App\Http\Controllers\api\CartController;
+use \App\Http\Controllers\api\OrderController;
+use \App\Http\Controllers\api\LeaderboardController;
 use Illuminate\Support\Facades\Route;
 
 Route::group([], function () {
@@ -17,6 +19,8 @@ Route::group([], function () {
     Route::post('login', [AuthController::class, 'login']);
     Route::post('send-otp', [PasswordController::class, 'sendOtp']);
     Route::post('forget-password', [PasswordController::class, 'forgetPassword']);
+    Route::get('/top-users', [LeaderboardController::class, 'topUsers']);
+
 
 
 });
@@ -46,7 +50,9 @@ Route::group(['middleware' => ['auth:api','changelanguage','role:user']], functi
     Route::get('/products', [ProudctController::class, 'index']);
     // cart api
     Route::post('/add_to_cart', [CartController::class, 'store']);
-
+    Route::patch('/cart/item/{cartItemId}', [CartController::class, 'updateCartItem']);
+    //order
+    Route::post('/confirm_order', [OrderController::class, 'confirmOrder']);
 
 });
 

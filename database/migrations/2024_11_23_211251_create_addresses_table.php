@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('governate');
             $table->string('city');
             $table->string('street');
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

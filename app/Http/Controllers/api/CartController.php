@@ -13,13 +13,6 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class CartController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -69,45 +62,112 @@ class CartController extends Controller
             }
 
             // Recalculate total price
-            $cart->load('items');
-            $cart->total_price = $cart->items->sum(fn($item) => $item->quantity * $item->price);
+            $cart->load('cartItems');
+            $cart->total_price = $cart->cartItems->sum(fn($item) => $item->quantity * $item->price);
             $cart->save();
 
             DB::commit();
 
             return response()->json([
                 'message' => 'Products added to cart',
-                'cart' => $cart->load('items'),
+                'cart' => $cart->load('cartItems'),
             ], 201);
 
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['error' => $e->getMessage()], 500);
         }
+        $user = JWTAuth::parseToken()->authenticate();
+
+    }
+
+    ///////////////////////////////////////////////////////////
+
+    // public function updateCartItem(Request $request, $cartItemId)
+    // {
+    //     $user = JWTAuth::user();
+
+
+    //     $validator = Validator::make($request->all(), [
+    //         'action' => 'required|in:decrease,remove,increase',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         return response()->json(['errors' => $validator->errors()], 422);
+    //     }
+
+
+    //     $cartItem = CartItem::whereHas('cart', function ($query) use ($user) {
+    //         $query->where('user_id', $user->id);
+    //     })->where('id', $cartItemId)->first();
+
+    //     if (!$cartItem) {
+    //         return response()->json(['message' => 'Cart item not found'], 404);
+    //     }
+
+    //     if ($request->action === 'decrease') {
+    //         if ($cartItem->quantity > 1) {
+    //             $cartItem->decrement('quantity');
+    //         } else {
+    //             $cartItem->delete();
+    //         }
+    //     } elseif ($request->action === 'remove') {
+    //         $cartItem->delete();
+    //     }
+
+
+    //     $cart = Cart::where('user_id', $user->id)->with('items')->first();
+    //     if ($cart) {
+    //         $cart->total_price = $cart->items->sum(fn($item) => $item->quantity * $item->price);
+    //         $cart->save();
+    //     }
+
+    //     return response()->json([
+    //         'message' => 'Cart item updated successfully',
+    //         'cart' => $cart,
+    //     ]);
+    // }
+    public function updateCartItem(Request $request, $cartItemId)
+{
+    $user = JWTAuth::user();
+
+    // التحقق من صحة البيانات
+    $validator = Validator::make($request->all(), [
+        'action' => 'required|in:increase,decrease,remove',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 422);
     }
 
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
+    $cartItem = CartItem::whereHas('cart', fn($query) => $query->where('user_id', $user->id))
+        ->where('id', $cartItemId)
+        ->first();
+
+    if (!$cartItem) {
+        return response()->json(['message' => 'Cart item not found'], 404);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
+
+    match ($request->action) {
+        'increase' => $cartItem->increment('quantity'),
+        'decrease' => $cartItem->quantity > 1 ? $cartItem->decrement('quantity') : $cartItem->delete(),
+        'remove'   => $cartItem->delete(),
+    };
+
+
+    $cart = Cart::where('user_id', $user->id)->first();
+    if ($cart) {
+        $cart->refreshTotalPrice();
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
+    return response()->json([
+        'message' => 'Cart item updated successfully',
+        'cart' => $cart->load('cartItems'),
+    ]);
+}
+
+
+
 }
