@@ -13,7 +13,7 @@ class ResetPassController extends Controller
     public function resetPassword(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'current_password' => 'required|string|min:6',
+//            'current_password' => 'required|string|min:6',
             'new_password' => 'required|string|min:6|confirmed',
         ]);
 
