@@ -57,7 +57,7 @@ class AuthController extends Controller
 
     public function GetProfile(Request $request)
     {
-        $user = auth('api')->user();
+        $user = auth('api')->user()->load('wallet');
 
         if (!$user) {
             return response()->json([
@@ -72,7 +72,14 @@ class AuthController extends Controller
         return response()->json([
             'status' => 200,
             'message' => "User retrieved successfully",
-            'user' => $user
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'phone' => $user->phone,
+                'image' => $user->image_url, // Using the accessor
+                'points' => $user->wallet?->points ?? 0, // If no wallet, return 0
+            ]
         ]);
     }
 
