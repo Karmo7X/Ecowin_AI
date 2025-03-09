@@ -11,6 +11,8 @@ use \App\Http\Controllers\api\CategoryController;
 use \App\Http\Controllers\api\CartController;
 use \App\Http\Controllers\api\OrderController;
 use \App\Http\Controllers\api\LeaderboardController;
+use \App\Http\Controllers\api\CopounController;
+use App\Http\Controllers\api\WalletController;
 use Illuminate\Support\Facades\Route;
 
 Route::group([], function () {
@@ -53,7 +55,10 @@ Route::group(['middleware' => ['auth:api','changelanguage','role:user']], functi
     Route::patch('/cart/item/{cartItemId}', [CartController::class, 'updateCartItem']);
     //order
     Route::post('/confirm_order', [OrderController::class, 'confirmOrder']);
-
+    // coupons api
+    Route::get('/coupons',[CopounController::class, 'index']);
+    Route::post('/redeem_coupon',[CopounController::class, 'redeemCoupon']);
+    Route::get('/wallet', [WalletController::class, 'getWallet']);
 });
 
 // Agent routes (For Agents Only)

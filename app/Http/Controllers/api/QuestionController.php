@@ -13,7 +13,18 @@ class QuestionController extends Controller
     public function index(Request $request)
     {
         $perpage = $request->input('perpage', 10);
-        $questions =Question::paginate($perpage);
+        $questions =Question::select(
+            'id',
+            'question_' . app()->getLocale() . ' as question',
+            'answer_' . app()->getLocale() . ' as answer',
+        )->paginate($perpage);
+
+        if ($questions->isEmpty()) {
+            return response()->json([
+                "status" => 404,
+                "message" => "Questions not found",
+            ],404);
+        }
        return response()->json([
            'message' => 'Questions returned successfully',
            'status' => 200,
@@ -32,9 +43,15 @@ class QuestionController extends Controller
     {
         $perpage = $request->input('perpage', 10);
         $search_term = $request->input('search');
-        $questions = Question::where('question', 'like', '%' . $search_term . '%')
-            ->orWhere('answer', 'like', '%' . $search_term . '%')
+        $questions = Question::select(
+            'id',
+            'question_' . app()->getLocale() . ' as question',
+            'answer_' . app()->getLocale() . ' as answer'
+        )
+            ->where('question_' . app()->getLocale(), 'like', '%' . $search_term . '%')
+            ->orWhere('answer_' . app()->getLocale(), 'like', '%' . $search_term . '%')
             ->paginate($perpage);
+
         if ($questions->isEmpty()) {
             return response()->json([
                 'message' => 'Questions not found',
