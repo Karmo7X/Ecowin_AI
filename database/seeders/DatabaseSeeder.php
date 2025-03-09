@@ -16,7 +16,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             CategorySeeder::class, // First, seed categories
             ProductSeeder::class,  // Then seed products
+            CopounSeeder::class,
             BlogSeeder::class,
+
         ]);
     }
 }

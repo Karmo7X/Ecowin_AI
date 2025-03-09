@@ -14,7 +14,15 @@ class BlogController extends Controller
     public function index(Request $request)
     {
           $perpage = $request->input('perpage', 10);
-           $blogs = Blog::paginate($perpage);
+
+
+          $blogs = Blog::select(
+            'id',
+            'title_' . app()->getLocale() . ' as title',
+            'body_' . app()->getLocale() . ' as body',
+            'image'
+
+          )->paginate($perpage);
            return response()->json([
                'message' => 'blogs return successfully',
                 'status' => 200,
@@ -35,7 +43,14 @@ class BlogController extends Controller
      */
     public function show(string $id)
     {
-        $blog=Blog::find($id);
+        $blog = Blog::where('id', $id)
+            ->select(
+                'id',
+                'title_' . app()->getLocale() . ' as title',
+                'body_' . app()->getLocale() . ' as body',
+                'image'
+            )
+            ->first(); // Get a single record
         if(!$blog){
            return response()->json([
                'status' => 404,

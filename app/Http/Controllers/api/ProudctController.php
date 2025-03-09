@@ -16,9 +16,26 @@ class ProudctController extends Controller
         $perpage = $request->input('perpage', 10);
         $categoryid = $request->input('categoryid');
 
-        $products = $categoryid
-            ? Product::where("category_id", $categoryid)->paginate($perpage)
-            : Product::paginate($perpage);
+        $products = Product::select(
+            'id',
+            'category_id',
+            'name_' . app()->getLocale() . ' as name',
+            'price',
+            'image',
+
+
+        )
+            ->when($categoryid, function ($query) use ($categoryid) {
+                return $query->where('category_id', $categoryid);
+            })
+            ->paginate($perpage);
+
+        if ($products->isEmpty()) {
+            return response()->json([
+                "status" => 404,
+                "message" => "product not found",
+            ],404);
+        }
         return response()->json([
             "status" => 200,
             "message" => "success",
@@ -32,13 +49,6 @@ class ProudctController extends Controller
         ],200);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
 
     /**
      * Display the specified resource.
@@ -48,19 +58,4 @@ class ProudctController extends Controller
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
 }

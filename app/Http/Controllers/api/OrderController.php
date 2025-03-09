@@ -63,7 +63,17 @@ $cart->cartItems()->delete();
 
             return response()->json([
                 'message' => 'تم تأكيد الطلب بنجاح!',
-                'order' => $order->load('items.product', 'address'),
+                'order' => $order->load(['items.product' => function ($query) {
+                    $query->select(
+                        'id',
+                        'name_' . app()->getLocale() . ' as name',
+                        'price',
+                        'category_id',
+                        'image',
+                        'created_at',
+                        'updated_at'
+                    );
+                }, 'address']),
             ], 201);
 
         } catch (\Exception $e) {

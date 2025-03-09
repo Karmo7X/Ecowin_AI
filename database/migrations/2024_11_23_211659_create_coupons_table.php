@@ -18,6 +18,7 @@ return new class extends Migration
             $table->decimal('price', 10, 2);
             $table->string('brand_ar');
             $table->string('brand_en');
+            $table->string('brand_image')->nullable();
             $table->unsignedBigInteger('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
 
