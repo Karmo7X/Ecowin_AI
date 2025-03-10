@@ -120,4 +120,16 @@ public function getImageUrlAttribute()
     {
         return $this->hasOne(Agent::class);
     }
+    protected static function booted()
+    {
+        static::created(function ($user) {
+            if (!$user->wallet) {
+                Wallet::create([
+                    'user_id' => $user->id,
+                    'points' => 0,
+                ]);
+            }
+        });
+    }
+
 }

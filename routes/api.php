@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\api\AuthController;
 use App\Http\Controllers\api\BlogController;
+use App\Http\Controllers\api\BrandController;
 use App\Http\Controllers\api\ContactController;
 use App\Http\Controllers\api\PasswordController;
 use App\Http\Controllers\api\QuestionController;
@@ -15,7 +16,7 @@ use \App\Http\Controllers\api\CopounController;
 use App\Http\Controllers\api\WalletController;
 use Illuminate\Support\Facades\Route;
 
-Route::group([], function () {
+Route::group(['changelanguage'], function () {
     // Public routes (No Authentication Required)
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
@@ -23,7 +24,16 @@ Route::group([], function () {
     Route::post('forget-password', [PasswordController::class, 'forgetPassword']);
     Route::get('/top-users', [LeaderboardController::class, 'topUsers']);
 
+    Route::get('/blogs', [BlogController::class, 'index']);
+    Route::get('/blogs/{id}', [BlogController::class, 'show']);
 
+    Route::post('contact', [ContactController::class, 'store']);
+    // questions api
+    Route::get('/questions', [QuestionController::class, 'index']);
+    Route::get('/question_search', [QuestionController::class, 'question_search']);
+
+    // brands api
+    Route::get('/brands', [BrandController::class, 'index']);
 
 });
 
@@ -39,13 +49,7 @@ Route::group(['middleware' => ['auth:api']], function () {
 Route::group(['middleware' => ['auth:api','changelanguage','role:user']], function () {
     // Users specific routes here...
 
-    Route::get('/blogs', [BlogController::class, 'index']);
-    Route::get('/blogs/{id}', [BlogController::class, 'show']);
 
-    Route::post('contact', [ContactController::class, 'store']);
-    // questions api
-    Route::get('/questions', [QuestionController::class, 'index']);
-    Route::get('/question_search', [QuestionController::class, 'question_search']);
     //category api
     Route::get('/categories', [CategoryController::class, 'index']);
     // products api
