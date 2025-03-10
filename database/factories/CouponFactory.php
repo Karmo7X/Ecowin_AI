@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\Coupon;
 use App\Models\User;
@@ -17,10 +18,9 @@ class CouponFactory extends Factory
             'code' => strtoupper(Str::random(10)),
             'discount_value' => $this->faker->randomFloat(2, 5, 50),
             'price' => $this->faker->randomFloat(2, 50, 500),
-            'brand_ar' => $this->faker->word(),
-            'brand_en' => $this->faker->word(),
-            'user_id' => 1,
-            'brand_image' => $this->faker->imageUrl(200, 200, 'brands'), // Generates a fake image URL
+//            'user_id' => 1,
+            'brand_id' => 1, // Generates a fake image URL
+            'expires_at' => Carbon::now()->addDays(30),
             'created_at' => now(),
             'updated_at' => now(),
         ];
