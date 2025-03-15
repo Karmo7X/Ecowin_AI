@@ -33,14 +33,14 @@ class User extends Authenticatable implements
     ];
     protected $appends = ['image_url'];
 
-public function getImageUrlAttribute()
-{
-    if (!empty($this->image)) {
-        return url('storage/' . $this->image);
-    }
+    public function getImageUrlAttribute()
+    {
+        if (!empty($this->image)) {
+            return url('storage/' . $this->image);
+        }
 
-    return url('/images/default-avatar.png');
-}
+        return url('/images/default-avatar.png');
+    }
 
 
 
@@ -48,7 +48,7 @@ public function getImageUrlAttribute()
     {
         if ($panel->getId() === 'dashboard') {
             // return str_ends_with($this->email, '@gmail.com');
-            return $this->role === EnumsUserRoleEnum::ADMIN->value;
+            return $this->role === "admin" || $this->role === "agent";
         }
 
         return true;
@@ -86,7 +86,7 @@ public function getImageUrlAttribute()
     {
         return [];
     }
-     public function wallet()
+    public function wallet()
     {
         return $this->hasOne(Wallet::class);
     }
@@ -131,5 +131,4 @@ public function getImageUrlAttribute()
             }
         });
     }
-
 }

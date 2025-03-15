@@ -20,7 +20,16 @@ class BlogResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-newspaper'; // أيقونة الصحيفة تناسب المقالات
     protected static ?int $navigationSort = 3;
     protected static ?string $navigationGroup = 'Content'; // فصل المدونة في مجموعة أخرى للمحتوى
-    protected static ?string $navigationLabel = 'Blog'; // التسمية ثابتة
+    protected static ?string $navigationLabel = 'Blogs'; // التسمية ثابتة
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->role === "admin"; //هام جدا في اخفاء الريسورس عن الايجنت role
+    }
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->role === "admin"; //هام جدا في اخفاء الريسورس عن الايجنت role
+    }
 
     public static function form(Form $form): Form
     {

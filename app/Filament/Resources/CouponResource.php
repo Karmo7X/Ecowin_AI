@@ -13,6 +13,9 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Models\User;
+use Illuminate\Support\Str;
+use Filament\Tables\Grouping\Group;
+
 
 class CouponResource extends Resource
 {
@@ -20,8 +23,17 @@ class CouponResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-ticket';
     protected static ?int $navigationSort = 3;
+
     protected static ?string $navigationGroup = 'Coupons Management';
     protected static ?string $navigationLabel = 'Coupons';
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->role === "admin"; //هام جدا في اخفاء الريسورس عن الايجنت role
+    }
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->role === "admin"; //هام جدا في اخفاء الريسورس عن الايجنت role
+    }
 
     public static function form(Form $form): Form
     {
@@ -29,7 +41,7 @@ class CouponResource extends Resource
             ->schema([
                 Forms\Components\TextInput::make("code")
                     ->unique(ignoreRecord: true)
-                    ->default("CO-" . random_int(100000, 9999999))
+                    ->default(Str::upper(Str::random(8)))
                     ->disabled()
                     ->dehydrated()
                     ->required(),
@@ -46,37 +58,37 @@ class CouponResource extends Resource
                     ->numeric()
                     ->required(),
 
-                Forms\Components\TextInput::make("brand_ar")
-                    ->required(),
+                Forms\Components\Select::make("brand_id")
+                    ->relationship('brand', "name_ar")->label("brand ar"),
+                Forms\Components\Select::make("brand_id")
+                    ->relationship('brand', "name_en")->label("brand en"),
 
-                Forms\Components\TextInput::make("brand_en")
-                    ->required(),
-
-                Forms\Components\Select::make("user_id")
-                    ->relationship("user", "name")
-                    ->required(),
             ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
+            // ->query(fn(Builder $query) => $query->whereNull('user_id'))
             ->columns([
                 Tables\Columns\TextColumn::make("code")->searchable()->sortable(),
-
-
                 Tables\Columns\TextColumn::make("discount_value")
                     ->label("Discount (%)")
                     ->formatStateUsing(fn($state) => $state . '%')
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make("price")->sortable(),
-                Tables\Columns\TextColumn::make("brand_ar")->searchable(),
-                Tables\Columns\TextColumn::make("brand_en")->searchable(),
-                Tables\Columns\TextColumn::make("user.name")->sortable(),
-                Tables\Columns\TextColumn::make("created_at")->dateTime()->sortable(),
+                Tables\Columns\TextColumn::make("brand.name_ar")->searchable()->sortable()->toggleable(),
+                Tables\Columns\TextColumn::make("brand.name_en")->searchable()->sortable()->toggleable(),
+                // Tables\Columns\TextColumn::make("user.name")->searchable()->sortable()->toggleable()
+                //     ->placeholder('without user'),
+                // Tables\Columns\TextColumn::make('user.name')
+                //     ->hidden(! auth()->user()->isAdmin())
             ])
-            ->filters([])
+            ->filters([
+                Tables\Filters\Filter::make('Without User')
+                    ->query(fn(Builder $query) => $query->whereNull('user_id'))
+                    ->default(),
+            ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make(),

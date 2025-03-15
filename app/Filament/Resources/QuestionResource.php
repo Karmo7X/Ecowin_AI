@@ -23,6 +23,15 @@ class QuestionResource extends Resource
     protected static ?int $navigationSort = 3;
     protected static ?string $navigationGroup = 'Content';
     protected static ?string $navigationLabel = 'Questions';
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->role === "admin"; //هام جدا في اخفاء الريسورس عن الايجنت role
+    }
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->role === "admin"; //هام جدا في اخفاء الريسورس عن الايجنت role
+    }
+
 
     public static function form(Form $form): Form
     {

@@ -18,9 +18,17 @@ class ProductResource extends Resource
     protected static ?string $model = Product::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-shopping-cart'; // أيقونة عربة التسوق تناسب المنتجات
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 1;
     protected static ?string $navigationGroup = 'Store'; // نفس المجموعة لتجميع المنتجات والفئات معًا
     protected static ?string $navigationLabel = 'Products'; // تصحيح التسمية لتكون بصيغة الجمع
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->role === "admin"; //هام جدا في اخفاء الريسورس عن الايجنت role
+    }
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->role === "admin"; //هام جدا في اخفاء الريسورس عن الايجنت role
+    }
 
 
 
