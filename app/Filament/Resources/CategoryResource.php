@@ -28,6 +28,15 @@ class CategoryResource extends Resource
     protected static ?int $navigationSort = 1;
     protected static ?string $navigationGroup = 'Store'; // المجموعة التي تضم التصنيفات والمنتجات
     protected static ?string $navigationLabel = 'Categories'; // اسم الفئات في القائمة
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->role === "admin"; //هام جدا في اخفاء الريسورس عن الايجنت role
+    }
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->role === "admin"; //هام جدا في اخفاء الريسورس عن الايجنت role
+    }
+
 
 
     public static function form(Form $form): Form
