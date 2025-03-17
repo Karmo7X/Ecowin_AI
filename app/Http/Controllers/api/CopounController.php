@@ -116,7 +116,7 @@ class CopounController extends Controller
             // Assign coupon to user and set expiration
             $coupon->update([
                 'user_id' => $user->id,
-                'redeemed_at' => now()->addMonth(),
+                'redeemed_at' => now(),
                 'expires_at' => now()->addMonth(),
             ]);
 
@@ -153,6 +153,46 @@ class CopounController extends Controller
         }
     }
 
+    public function MyCoupons(Request $request)
+    {
+        $user = Auth::user();
+        $perpage = $request->input('perpage', 10);
+        $locale = app()->getLocale();
 
+        // Fetch all coupons with brands
+        $coupons = Coupon::with('brand')
+            ->where('user_id', $user->id)
+            ->select('id', 'brand_id', 'code', 'discount_value', 'price', 'user_id')
+            ->paginate($perpage);
+
+        $dataCoupons = $coupons->map(function ($coupon) use ($locale) {
+            return [
+                'id' => $coupon->id,
+                'code' => $coupon->code,
+                'discount_value' => $coupon->discount_value,
+                'price' => $coupon->price,
+                'brand_id' => $coupon->brand_id,
+                'brand_name' => $locale === 'ar' ? $coupon->brand->name_ar : $coupon->brand->name_en,
+                'brand_image' => $coupon->brand->brand_image ?? null,
+            ];
+        });
+
+        if ($coupons->isEmpty()) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'No coupons found',
+                'data' => [],
+            ], 404);
+        }
+
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'User coupons retrieved successfully',
+            'data' => $dataCoupons,
+        ]);
+
+
+    }
 
 }

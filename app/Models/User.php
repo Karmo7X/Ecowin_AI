@@ -39,7 +39,10 @@ class User extends Authenticatable implements
             return url('storage/' . $this->image);
         }
 
-        return url('/images/default-avatar.png');
+
+        // Return external URL directly without using `url()`
+        return 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png';
+
     }
 
 

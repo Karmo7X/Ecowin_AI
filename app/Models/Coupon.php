@@ -15,6 +15,9 @@ class Coupon extends Model
         'price',
         "brand_id",
         'user_id',
+        'redeemed_at',
+        'expires_at',
+
     ];
 
 
