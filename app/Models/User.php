@@ -39,8 +39,10 @@ class User extends Authenticatable implements
             return url('storage/' . $this->image);
         }
 
+
         // Return external URL directly without using `url()`
         return 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png';
+
     }
 
 
@@ -49,7 +51,7 @@ class User extends Authenticatable implements
     {
         if ($panel->getId() === 'dashboard') {
             // return str_ends_with($this->email, '@gmail.com');
-            return $this->role === EnumsUserRoleEnum::ADMIN->value;
+            return $this->role === "admin" || $this->role === "agent";
         }
 
         return true;
@@ -87,7 +89,7 @@ class User extends Authenticatable implements
     {
         return [];
     }
-     public function wallet()
+    public function wallet()
     {
         return $this->hasOne(Wallet::class);
     }
@@ -132,5 +134,4 @@ class User extends Authenticatable implements
             }
         });
     }
-
 }
