@@ -33,14 +33,15 @@ class User extends Authenticatable implements
     ];
     protected $appends = ['image_url'];
 
-public function getImageUrlAttribute()
-{
-    if (!empty($this->image)) {
-        return url('storage/' . $this->image);
-    }
+    public function getImageUrlAttribute()
+    {
+        if (!empty($this->image)) {
+            return url('storage/' . $this->image);
+        }
 
-    return url('/images/default-avatar.png');
-}
+        // Return external URL directly without using `url()`
+        return 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png';
+    }
 
 
 

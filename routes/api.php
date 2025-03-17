@@ -13,6 +13,7 @@ use \App\Http\Controllers\api\CartController;
 use \App\Http\Controllers\api\OrderController;
 use \App\Http\Controllers\api\LeaderboardController;
 use \App\Http\Controllers\api\CopounController;
+use App\Http\Controllers\api\TransactionController;
 use App\Http\Controllers\api\WalletController;
 use Illuminate\Support\Facades\Route;
 
@@ -27,7 +28,7 @@ Route::group(['changelanguage'], function () {
     Route::get('/blogs', [BlogController::class, 'index']);
     Route::get('/blogs/{id}', [BlogController::class, 'show']);
 
-    Route::post('contact', [ContactController::class, 'store']);
+    Route::post('/contact', [ContactController::class, 'store']);
     // questions api
     Route::get('/questions', [QuestionController::class, 'index']);
     Route::get('/question_search', [QuestionController::class, 'question_search']);
@@ -62,7 +63,12 @@ Route::group(['middleware' => ['auth:api','changelanguage','role:user']], functi
     // coupons api
     Route::get('/coupons',[CopounController::class, 'index']);
     Route::post('/redeem_coupon',[CopounController::class, 'redeemCoupon']);
+    Route::get('/my_coupons',[CopounController::class, 'myCoupons']);
+    // wallet api
     Route::get('/wallet', [WalletController::class, 'getWallet']);
+    //transaction api
+    Route::get('/transactions', [TransactionController::class, 'index']);
+
 });
 
 // Agent routes (For Agents Only)
