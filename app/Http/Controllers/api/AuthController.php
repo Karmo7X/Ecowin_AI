@@ -50,6 +50,7 @@ class AuthController extends Controller
          'status' => 201,
          'message'=> "user logged in successfuly",
         'token' => $token,
+         'expires_in' => auth()->factory()->getTTL() * 60
 //        'user' => auth('api')->user(),
 
       ],201);

@@ -22,6 +22,7 @@ Route::group(['changelanguage'], function () {
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
     Route::post('send-otp', [PasswordController::class, 'sendOtp']);
+    Route::post('/confirm_otp', [PasswordController::class, 'confirmOtp']);
     Route::post('forget-password', [PasswordController::class, 'forgetPassword']);
     Route::get('/top-users', [LeaderboardController::class, 'topUsers']);
 
