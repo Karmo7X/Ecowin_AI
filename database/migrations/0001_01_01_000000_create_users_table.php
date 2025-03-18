@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('image')->nullable();
             $table->enum('role', ['user', 'agent', 'admin'])->default('user');
             $table->string('otp')->nullable();
+            $table->boolean('is_otp_verified')->default(false);
             $table->timestamp('otp_expired_at')->nullable();
             $table->timestamps();
         });
