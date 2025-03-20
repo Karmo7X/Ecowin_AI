@@ -36,7 +36,7 @@ class UserResource extends Resource
                     ->label('Email')
                     ->required()
                     ->email()
-                    ->unique(User::class, 'email'),
+                    ->unique(User::class, 'email', ignoreRecord: true),
 
                 Forms\Components\TextInput::make('password')
                     ->label('Password')
