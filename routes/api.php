@@ -43,6 +43,7 @@ Route::group(['changelanguage'], function () {
 Route::group(['middleware' => ['auth:api']], function () {
     Route::get('/get_profile', [AuthController::class, 'GetProfile']);
     Route::post('/edit_profile', [AuthController::class, 'EditProfile']);
+    Route::post('/update_profile_image', [AuthController::class, 'UpdateProfileImage']);
     Route::post('/reset-password', [ResetPassController::class, 'resetPassword']);
     Route::post('/logout', [AuthController::class, 'logout']);
 });
