@@ -9,6 +9,7 @@ use App\Models\Address;
 use App\Models\DonationImage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Jobs\SendDonationThankYouEmail;
 
 class DonationController extends Controller
 {
@@ -19,7 +20,7 @@ class DonationController extends Controller
         DB::beginTransaction();
 
         try {
-            // 1. حفظ العنوان
+
             $address = Address::create([
                 'governate' => $donationRequest->governate,
                 'city' => $donationRequest->city,
@@ -27,7 +28,7 @@ class DonationController extends Controller
                 'user_id' => $user->id,
             ]);
 
-            // 2. حفظ التبرع
+
             $donation = Donation::create([
                 'user_id' => $user->id,
                 'address_id' => $address->id,
@@ -35,7 +36,7 @@ class DonationController extends Controller
                 'description' => $donationRequest->description,
             ]);
 
-            // 3. رفع الصور وتخزينها
+
             if ($donationRequest->hasFile('images')) {
                 foreach ($donationRequest->file('images') as $imageFile) {
                     $path = $imageFile->store('donations', 'public');
@@ -49,6 +50,7 @@ class DonationController extends Controller
 
             DB::commit();
 
+            SendDonationThankYouEmail::dispatch($donation, $user->name, $user->email);
             return response()->json([
                 'message' => 'شكرا لتبرعك ',
                 'donation' => $donation->load('images', 'address'),

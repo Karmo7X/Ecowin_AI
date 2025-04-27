@@ -12,6 +12,8 @@ use App\Models\Address;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Jobs\SendOrderEmailJob;
+use App\Mail\OrderCreatedMail;
 
 
 class OrderController extends Controller
@@ -25,11 +27,22 @@ class OrderController extends Controller
             return response()->json(['message' => 'Cart is empty!'], 400);
         }
 
+        $totalPoints = 0;
+
+    foreach ($cart->cartItems as $cartItem) {
+        $totalPrice = $cartItem->quantity * $cartItem->price;
+        $totalPoints += $totalPrice;
+    }
+
+    if ($totalPoints < 50) {
+        return response()->json(['message' => 'يجب أن يكون مجموع النقاط أكثر من 50 نقطة لإتمام الطلب.'], 400);
+    }
+
         DB::beginTransaction();
         try {
 
             $address = Address::create([
-                'governate' => $request->governrate,
+                'governate' => $request->governate,
                 'city' => $request->city,
                 'street' => $request->street,
                 'user_id' => $user->id,
@@ -44,7 +57,7 @@ $order = Order::create([
 ]);
 
 foreach ($cart->cartItems as $cartItem) {
-    $totalPrice = $cartItem->quantity * $cartItem->price; // سعر العنصر في الطلب
+    $totalPrice = $cartItem->quantity * $cartItem->price;
         $totalPoints += $totalPrice;
     Order_item::create([
         'order_id' => $order->id,
@@ -59,6 +72,11 @@ $order->update(['points' => $totalPoints]);
 $cart->cartItems()->delete();
 
             DB::commit();
+            dispatch(new SendOrderEmailJob(
+                $order->load('items.product'),
+                $user->name,
+                $user->email
+            ));
 
             return response()->json([
                 'message' => 'تم تأكيد الطلب بنجاح!',
@@ -69,8 +87,8 @@ $cart->cartItems()->delete();
                         'price',
                         'category_id',
                         'image',
-                        'created_at',
-                        'updated_at'
+                        'created_at'
+
                     );
                 }, 'address']),
             ], 201);
