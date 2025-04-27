@@ -22,8 +22,8 @@ class AddressRequest extends FormRequest
     public function rules()
     {
         return [
-            'governrate' => 'required|string|in:الدقهلية,mansoura',
-            'city' => 'required|string|in:المنصورة,sherbin,طنطا',
+            'governate' => 'required|string',
+            'city' => 'required|string',
             'street' => 'required|string|max:255',
         ];
     }
@@ -31,7 +31,7 @@ class AddressRequest extends FormRequest
     public function messages()
     {
         return [
-            'governrate.in' => 'المحافظة يجب أن تكون "الدقهلية" أو "الغربية".',
+            'governate.in' => 'المحافظة يجب أن تكون "الدقهلية" أو "الغربية".',
             'city.in' => 'المدينة غير صالحة، يُرجى اختيار مدينة صحيحة.',
         ];
     }

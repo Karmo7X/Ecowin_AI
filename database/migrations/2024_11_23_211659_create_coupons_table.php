@@ -18,11 +18,9 @@ return new class extends Migration
             $table->decimal('price', 10, 2);
             $table->dateTime('expires_at')->nullable(); // when it's no longer usable
             $table->dateTime('redeemed_at')->nullable(); // when user redeems it
-            $table->unsignedBigInteger('user_id')->nullable();
-            $table->unsignedBigInteger('brand_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('brand_id')->constrained()->onDelete('cascade');
             $table->timestamps();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('brand_id')->references('id')->on('brands')->onDelete('cascade');
         });
 
     }

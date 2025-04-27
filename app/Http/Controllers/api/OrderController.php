@@ -20,7 +20,6 @@ class OrderController extends Controller
     {
         $user = Auth::user();
 
-        //$cart = $user->cart()->with('cartItems')->first();
         $cart = Cart::where('user_id', $user->id)->with('cartItems')->first();
         if (!$cart || $cart->cartItems->isEmpty()) {
             return response()->json(['message' => 'Cart is empty!'], 400);

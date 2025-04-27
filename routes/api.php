@@ -15,6 +15,7 @@ use \App\Http\Controllers\api\LeaderboardController;
 use \App\Http\Controllers\api\CopounController;
 use App\Http\Controllers\api\TransactionController;
 use App\Http\Controllers\api\WalletController;
+use App\Http\Controllers\api\DonationController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['changelanguage'], function () {
@@ -69,7 +70,8 @@ Route::group(['middleware' => ['auth:api','changelanguage','role:user']], functi
     Route::get('/wallet', [WalletController::class, 'getWallet']);
     //transaction api
     Route::get('/transactions', [TransactionController::class, 'index']);
-
+    //charity api
+    Route::post('/donate', [DonationController::class, 'store']);
 });
 
 // Agent routes (For Agents Only)
