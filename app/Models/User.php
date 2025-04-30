@@ -122,6 +122,10 @@ class User extends Authenticatable implements
     {
         return $this->hasOne(Agent::class);
     }
+    public function donations()
+    {
+        return $this->hasMany(Donation::class);
+    }
     protected static function booted()
     {
         static::created(function ($user) {

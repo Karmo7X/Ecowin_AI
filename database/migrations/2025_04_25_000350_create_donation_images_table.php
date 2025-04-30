@@ -11,15 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('addresses', function (Blueprint $table) {
+        Schema::create('donation_images', function (Blueprint $table) {
             $table->id();
-            $table->string('governate');
-            $table->string('city');
-            $table->string('street');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('donation_id')->constrained()->onDelete('cascade');
+            $table->string('image');
             $table->timestamps();
         });
-
     }
 
     /**
@@ -27,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('addresses');
+        Schema::dropIfExists('donation_images');
     }
 };
