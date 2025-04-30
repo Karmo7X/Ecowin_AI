@@ -9,24 +9,7 @@ use Illuminate\Http\JsonResponse;
 
 class LeaderboardController extends Controller
 {
-    // public function topUsers(): JsonResponse
-    // {
-    //     $topUsers = User::with('wallet')
-    //         ->whereHas('wallet')
-    //         ->orderByDesc('wallet.points')
-    //         ->limit(10)
-    //         ->get(['id', 'name', 'image']);
-
-    //     return response()->json([
-    //         'message' => 'Top 10 users with highest points',
-    //         'users' => $topUsers->map(fn($user) => [
-    //             'id' => $user->id,
-    //             'name' => $user->name,
-    //             'profile_picture' => $user->image_url,
-    //             'points' => $user->wallet->points ?? 0,
-    //         ]),
-    //     ]);
-    // }
+    
     public function topUsers(): JsonResponse
 {
     $topUsers = User::select('users.id', 'users.name', 'users.image', 'wallets.points')
