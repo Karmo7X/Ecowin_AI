@@ -22,50 +22,38 @@ class CopounController extends Controller
         $perpage = $request->input('perpage', 10);
         $locale = app()->getLocale();
 
-        // Fetch all coupons with brands
+        // Fetch all coupons with brand relationship
         $coupons = Coupon::with('brand')
             ->select('id', 'brand_id', 'code', 'discount_value', 'price')
             ->get();
 
-        // Group by unique id + discount_value combo
-        $grouped = $coupons->unique(function ($item) {
-            return $item->id . '_' . $item->discount_value;
+        // Group by brand_id + discount_value + price
+        $grouped = $coupons->groupBy(function ($item) {
+            return $item->brand_id . '_' . $item->discount_value . '_' . $item->price;
+        });
+
+        // Transform to desired structure
+        $formatted = $grouped->map(function ($items) use ($locale) {
+            $first = $items->first();
+            return [
+                'brand_id' => $first->brand_id,
+                'brand_name' => $locale === 'ar' ? $first->brand->name_ar : $first->brand->name_en,
+                'brand_image' => $first->brand->brand_image ?? null,
+                'discount_value' => number_format($first->discount_value, 2),
+                'price' => number_format($first->price, 2),
+
+            ];
         })->values();
 
         // Manual pagination
         $currentPage = (int) $request->input('page', 1);
-        $total = $grouped->count();
-        $sliced = $grouped->slice(($currentPage - 1) * $perpage, $perpage)->values();
-
-        // Format response
-        $data = $sliced->map(function ($coupon) use ($locale ,$coupons) {
-            $quantity = $coupons->filter(function ($item) use ($coupon) {
-                return $item->brand_id == $coupon->brand_id && $item->discount_value == $coupon->discount_value;
-            })->count();
-            return [
-                'id' => $coupon->id,
-                'code' => $coupon->code,
-                'discount_value' => $coupon->discount_value,
-                'price' => $coupon->price,
-                'brand_id' => $coupon->brand_id,
-                'brand_name' => $locale === 'ar' ? $coupon->brand->name_ar : $coupon->brand->name_en,
-                'brand_image' => $coupon->brand->brand_image ?? null,
-                'quantity' => $quantity,
-            ];
-        });
-
-        if ($data->isEmpty()) {
-            return response()->json([
-                'status' => 404,
-                'message' => 'No coupons found',
-                'data' => [],
-            ], 404);
-        }
+        $total = $formatted->count();
+        $sliced = $formatted->slice(($currentPage - 1) * $perpage, $perpage)->values();
 
         return response()->json([
             'status' => 200,
             'message' => 'Coupons returned successfully',
-            'data' => $data,
+            'data' => $sliced,
             'meta' => [
                 'total' => $total,
                 'current_page' => $currentPage,
