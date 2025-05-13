@@ -81,52 +81,7 @@ class CartController extends Controller
 
     }
 
-    ///////////////////////////////////////////////////////////
 
-    // public function updateCartItem(Request $request, $cartItemId)
-    // {
-    //     $user = JWTAuth::user();
-
-
-    //     $validator = Validator::make($request->all(), [
-    //         'action' => 'required|in:decrease,remove,increase',
-    //     ]);
-
-    //     if ($validator->fails()) {
-    //         return response()->json(['errors' => $validator->errors()], 422);
-    //     }
-
-
-    //     $cartItem = CartItem::whereHas('cart', function ($query) use ($user) {
-    //         $query->where('user_id', $user->id);
-    //     })->where('id', $cartItemId)->first();
-
-    //     if (!$cartItem) {
-    //         return response()->json(['message' => 'Cart item not found'], 404);
-    //     }
-
-    //     if ($request->action === 'decrease') {
-    //         if ($cartItem->quantity > 1) {
-    //             $cartItem->decrement('quantity');
-    //         } else {
-    //             $cartItem->delete();
-    //         }
-    //     } elseif ($request->action === 'remove') {
-    //         $cartItem->delete();
-    //     }
-
-
-    //     $cart = Cart::where('user_id', $user->id)->with('items')->first();
-    //     if ($cart) {
-    //         $cart->total_price = $cart->items->sum(fn($item) => $item->quantity * $item->price);
-    //         $cart->save();
-    //     }
-
-    //     return response()->json([
-    //         'message' => 'Cart item updated successfully',
-    //         'cart' => $cart,
-    //     ]);
-    // }
     public function updateCartItem(Request $request, $cartItemId)
 {
     $user = JWTAuth::user();

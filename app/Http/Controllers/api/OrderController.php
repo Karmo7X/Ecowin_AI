@@ -37,7 +37,6 @@ class OrderController extends Controller
     if ($totalPoints < 50) {
         return response()->json(['message' => 'يجب أن يكون مجموع النقاط أكثر من 50 نقطة لإتمام الطلب.'], 400);
     }
-
         DB::beginTransaction();
         try {
 
@@ -88,7 +87,6 @@ $cart->cartItems()->delete();
                         'category_id',
                         'image',
                         'created_at'
-
                     );
                 }, 'address']),
             ], 201);
