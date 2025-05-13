@@ -16,7 +16,7 @@ class TransactionController extends Controller
     {
         $user=Auth::user();
         $perpage=$request->input('perpage', 10);
-        $transactions=Transaction::where('user_id',$user->id)->paginate($perpage);
+        $transactions=Transaction::where('user_id',$user->id)->orderByDesc('created_at')->paginate($perpage);
 
         if($transactions->isEmpty()){
             return response()->json([

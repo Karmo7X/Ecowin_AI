@@ -59,7 +59,7 @@ class AuthController extends Controller
 
     public function GetProfile(Request $request)
     {
-        $user = auth('api')->user()->load('wallet');
+        $user = auth('api')->user()->load('wallet', 'transactions');
 
         if (!$user) {
             return response()->json([
@@ -70,7 +70,7 @@ class AuthController extends Controller
 
         // إضافة رابط الصورة الكامل
         $user->image = $user->image ? asset('storage/' . $user->image) : null;
-
+        $lastTransaction = $user->transactions()->latest()->first();
         return response()->json([
             'status' => 200,
             'message' => "User retrieved successfully",
@@ -82,6 +82,7 @@ class AuthController extends Controller
                 'role'=> $user->role,
                 'image' => $user->image_url, // Using the accessor
                 'points' => $user->wallet?->points ?? 0, // If no wallet, return 0
+                'last_transaction' => $lastTransaction
             ]
         ]);
     }
