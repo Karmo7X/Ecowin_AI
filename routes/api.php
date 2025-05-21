@@ -63,6 +63,7 @@ Route::group(['middleware' => ['auth:api','changelanguage','role:user']], functi
     Route::patch('/cart/item/{cartItemId}', [CartController::class, 'updateCartItem']);
     //order
     Route::post('/confirm_order', [OrderController::class, 'confirmOrder']);
+    Route::get('/my_orders', [OrderController::class, 'myorders']);
     // coupons api
     Route::get('/coupons',[CopounController::class, 'index']);
     Route::post('/redeem_coupon',[CopounController::class, 'redeemCoupon']);

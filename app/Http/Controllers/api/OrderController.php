@@ -96,4 +96,21 @@ $cart->cartItems()->delete();
             return response()->json(['message' => 'حدث خطأ أثناء معالجة الطلب!', 'error' => $e->getMessage()], 500);
         }
     }
+
+    public function myorders(Request $request)
+    {
+        $user = Auth::user();
+        $orders = Order::where('user_id', $user->id)
+            ->with('orderItems.product')
+            ->first();
+        if (!$orders || $orders->orderItems->isEmpty()) {
+            return response()->json(['message' => 'No orders found'], 404); // الأفضل استخدام 404
+        }
+
+        return response()->json([
+            'message' => 'Orders returned successfully',
+            'order' => $orders
+        ], 200);
+    }
+
 }

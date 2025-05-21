@@ -19,7 +19,7 @@ class Order extends Model
     public function agent(){
         return $this->belongsTo(Agent::class);
     }
-    public function items()
+    public function orderItems()
     {
         return $this->hasMany(Order_item::class, 'order_id');
     }
