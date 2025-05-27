@@ -14,20 +14,15 @@ class CategoryController extends Controller
      */
     public function index(Request $request)
     {
-        $perpage = $request->input('perpage', 10);
+//        $perpage = $request->input('perpage', 10);
         // Get the requested language (default to English)
 
-        $categories = Category::select('id', 'name_' . app()->getLocale(). ' as name', 'image')->paginate($perpage);
+        $categories = Category::select('id', 'name_' . app()->getLocale(). ' as name')->get();
         return response()->json([
-            'message' => 'blogs return successfully',
+            'message' => 'categories return successfully',
             'status' => 200,
-            'data' => $categories->items(),
-            'meta' => [
-                'total' => $categories->total(),
-                'current_page' => $categories->currentPage(),
-                'last_page' => $categories->lastPage(),
-                'per_page' =>$categories->perPage(),
-            ]
+            'data' => $categories,
+
         ],200);
     }
 }

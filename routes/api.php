@@ -59,10 +59,14 @@ Route::group(['middleware' => ['auth:api','changelanguage','role:user']], functi
     // products api
     Route::get('/products', [ProudctController::class, 'index']);
     // cart api
+    Route::get('/cart/get', [CartController::class, 'index']);
     Route::post('/add_to_cart', [CartController::class, 'store']);
-    Route::patch('/cart/item/{cartItemId}', [CartController::class, 'updateCartItem']);
+    Route::patch('/cart/update', [CartController::class, 'update']);
+    Route::delete('/cart/delete', [CartController::class, 'delete']);
+    Route::delete('/cart/item/{itemId}', [CartController::class, 'removeItem']);
     //order
     Route::post('/confirm_order', [OrderController::class, 'confirmOrder']);
+    Route::get('/my_orders', [OrderController::class, 'myorders']);
     // coupons api
     Route::get('/coupons',[CopounController::class, 'index']);
     Route::post('/redeem_coupon',[CopounController::class, 'redeemCoupon']);
