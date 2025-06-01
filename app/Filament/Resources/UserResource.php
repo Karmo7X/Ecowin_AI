@@ -52,9 +52,6 @@ class UserResource extends Resource
 
                 ])->required()->default("user"),
 
-                Forms\Components\TextInput::make('otp')
-                    ->label('OTP')
-                    ->nullable(),
 
             ]);
     }

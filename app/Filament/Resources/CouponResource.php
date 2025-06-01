@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Models\User;
 use Illuminate\Support\Str;
 use Filament\Tables\Grouping\Group;
-
+use Illuminate\Support\Facades\Log;
 
 class CouponResource extends Resource
 {
@@ -26,6 +26,8 @@ class CouponResource extends Resource
 
     protected static ?string $navigationGroup = 'Coupons Management';
     protected static ?string $navigationLabel = 'Coupons';
+
+
     public static function shouldRegisterNavigation(): bool
     {
         return auth()->user()?->role === "admin"; //هام جدا في اخفاء الريسورس عن الايجنت role
@@ -37,6 +39,7 @@ class CouponResource extends Resource
 
     public static function form(Form $form): Form
     {
+
         return $form
             ->schema([
                 Forms\Components\TextInput::make("code")
@@ -55,13 +58,23 @@ class CouponResource extends Resource
                     ->default(0),
 
                 Forms\Components\TextInput::make("price")
-                    ->numeric()
+                    ->numeric()->minvalue(0)
                     ->required(),
 
-                Forms\Components\Select::make("brand_id")
-                    ->relationship('brand', "name_ar")->label("brand ar"),
+                // Forms\Components\Select::make("brand_id")
+                //     ->relationship('brand', "name_ar")->label("brand ar"),
                 Forms\Components\Select::make("brand_id")
                     ->relationship('brand', "name_en")->label("brand en"),
+
+                Forms\Components\DateTimePicker::make('expires_at')
+                    ->label('Expiration Date & Time')
+                    ->required() // Make the field mandatory
+                    ->native(false) // Prefer JavaScript date picker for a better UX
+                    ->displayFormat('d/m/Y H:i') // Format shown to the user in the UI (e.g., 01/06/2025 04:24)
+                    ->format('Y-m-d H:i:s') // **Crucial:** Format for database storage (e.g., 2025-06-01 04:24:00)
+                    ->minDate(now()->startOfDay()) // Set the minimum selectable date (today's start)
+                    ->seconds(false) // Disable seconds selection in the picker
+                    ->helperText('Please specify the date and time when this product expires.'),
 
             ]);
     }
@@ -77,17 +90,20 @@ class CouponResource extends Resource
                     ->formatStateUsing(fn($state) => $state . '%')
                     ->sortable(),
                 Tables\Columns\TextColumn::make("price")->sortable(),
-                Tables\Columns\TextColumn::make("brand.name_ar")->searchable()->sortable()->toggleable(),
+                // Tables\Columns\TextColumn::make("brand.name_ar")->searchable()->sortable()->toggleable(),
                 Tables\Columns\TextColumn::make("brand.name_en")->searchable()->sortable()->toggleable(),
-                // Tables\Columns\TextColumn::make("user.name")->searchable()->sortable()->toggleable()
-                //     ->placeholder('without user'),
-                // Tables\Columns\TextColumn::make('user.name')
-                //     ->hidden(! auth()->user()->isAdmin())
+                Tables\Columns\TextColumn::make('expires_at')
+                    ->label('Expiration Date')
+                    ->dateTime('d M Y, H:i') // Format for display in the table (e.g., 01 Jun 2025, 04:24)
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false), // Allows hiding/showing the column
+
+
             ])
             ->filters([
-                Tables\Filters\Filter::make('Without User')
-                    ->query(fn(Builder $query) => $query->whereNull('user_id'))
-                    ->default(),
+                // Tables\Filters\Filter::make('Without User')
+                //     ->query(fn(Builder $query) => $query->whereNull('user_id'))
+                //     ->default(),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
