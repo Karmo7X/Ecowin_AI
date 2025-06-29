@@ -18,7 +18,7 @@ use App\Http\Controllers\api\WalletController;
 use App\Http\Controllers\api\DonationController;
 use Illuminate\Support\Facades\Route;
 
-Route::group(['changelanguage'], function () {
+Route::group(['middleware' =>['changelanguage', 'throttle:60,1']], function () {
     // Public routes (No Authentication Required)
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
@@ -41,7 +41,7 @@ Route::group(['changelanguage'], function () {
 });
 
 // Protected Routes for Any Authenticated User (No Role Required)
-Route::group(['middleware' => ['auth:api']], function () {
+Route::group(['middleware' => ['auth:api', 'throttle:60,1']], function () {
     Route::get('/get_profile', [AuthController::class, 'GetProfile']);
     Route::post('/edit_profile', [AuthController::class, 'EditProfile']);
     Route::post('/reset-password', [ResetPassController::class, 'resetPassword']);
@@ -49,7 +49,7 @@ Route::group(['middleware' => ['auth:api']], function () {
 });
 
 // Routes accessible by users only
-Route::group(['middleware' => ['auth:api','changelanguage','role:user']], function () {
+Route::group(['middleware' => ['auth:api','changelanguage','role:user', 'throttle:60,1']], function () {
     // Users specific routes here...
 
 
@@ -75,12 +75,12 @@ Route::group(['middleware' => ['auth:api','changelanguage','role:user']], functi
 });
 
 // Agent routes (For Agents Only)
-Route::group(['middleware' => ['auth:api', 'role:agent']], function () {
+Route::group(['middleware' => ['auth:api', 'role:agent', 'throttle:60,1']], function () {
     // Agent specific routes here...
 });
 
 // Admin routes (For Admins Only)
-Route::group(['middleware' => ['auth:api', 'role:admin']], function () {
+Route::group(['middleware' => ['auth:api', 'role:admin', 'throttle:60,1']], function () {
     // Admins specific routes here...
 });
 
