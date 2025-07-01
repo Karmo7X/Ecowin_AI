@@ -26,6 +26,8 @@ class DonationController extends Controller
                 'city' => $donationRequest->city,
                 'street' => $donationRequest->street,
                 'user_id' => $user->id,
+                'building_no' => $donationRequest->building_no,
+                'phone' => $donationRequest->phone,
             ]);
 
 

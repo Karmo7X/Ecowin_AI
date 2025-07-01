@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\api;
-
+use Illuminate\Support\Facades\Cache;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -9,14 +9,16 @@ use Illuminate\Http\JsonResponse;
 
 class LeaderboardController extends Controller
 {
-    
+
     public function topUsers(): JsonResponse
 {
-    $topUsers = User::select('users.id', 'users.name', 'users.image', 'wallets.points')
+    $topUsers = Cache::remember('top_users_leaderboard', 120, function (){
+        User::select('users.id', 'users.name', 'users.image', 'wallets.points')
         ->join('wallets', 'users.id', '=', 'wallets.user_id')
         ->orderByDesc('wallets.points')
         ->limit(10)
         ->get();
+    });
 
         if ($topUsers->isEmpty()) {
             return response()->json([

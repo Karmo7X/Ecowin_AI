@@ -13,7 +13,9 @@ class Address extends Model
         'governate',
         'city',
         'street',
-        'user_id'
+        'user_id',
+        'building_no',
+        'phone'
     ];
 
     public function user()
