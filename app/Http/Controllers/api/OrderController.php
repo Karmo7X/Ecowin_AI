@@ -44,6 +44,8 @@ class OrderController extends Controller
                 'governate' => $request->governate,
                 'city' => $request->city,
                 'street' => $request->street,
+                'building_no' => $request->building_no,
+                'phone' => $request->phone,
                 'user_id' => $user->id,
             ]);
 
