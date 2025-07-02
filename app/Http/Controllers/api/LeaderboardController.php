@@ -9,6 +9,7 @@ use Illuminate\Http\JsonResponse;
 
 class LeaderboardController extends Controller
 {
+
     public function topUsers(): JsonResponse
 {
     $topUsers = Cache::remember('top_users_leaderboard', 120, function (){
@@ -31,7 +32,7 @@ class LeaderboardController extends Controller
         'users' => $topUsers->map(fn($user) => [
             'id' => $user->id,
             'name' => $user->name,
-            'profile_picture' => $user->image_url,
+            'profile_picture' => $user->image ? url('storage/' . $user->image) : url('images/default.webp'), // توليد الرابط الكامل للصورة
             'points' => $user->points ?? 0,
         ]),
     ]);
