@@ -25,6 +25,8 @@ class AddressRequest extends FormRequest
             'governate' => 'required|string',
             'city' => 'required|string',
             'street' => 'required|string|max:255',
+            'building_no' => 'required|string|max:10',
+            'phone' => 'required|string|regex:/^01[0-2,5]{1}[0-9]{8}$/',
         ];
     }
 

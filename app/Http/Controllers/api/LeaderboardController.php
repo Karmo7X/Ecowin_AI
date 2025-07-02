@@ -12,7 +12,7 @@ class LeaderboardController extends Controller
     public function topUsers(): JsonResponse
 {
     $topUsers = Cache::remember('top_users_leaderboard', 120, function (){
-        User::select('users.id', 'users.name', 'users.image', 'wallets.points')
+       return User::select('users.id', 'users.name', 'users.image', 'wallets.points')
         ->join('wallets', 'users.id', '=', 'wallets.user_id')
         ->orderByDesc('wallets.points')
         ->limit(10)
