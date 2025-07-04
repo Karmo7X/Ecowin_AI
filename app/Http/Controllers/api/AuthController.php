@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
+use App\Models\Wallet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -50,6 +51,7 @@ class AuthController extends Controller
          'status' => 201,
          'message'=> "user logged in successfuly",
         'token' => $token,
+         'expires_in' => auth()->factory()->getTTL() * 60
 //        'user' => auth('api')->user(),
 
       ],201);
@@ -57,7 +59,7 @@ class AuthController extends Controller
 
     public function GetProfile(Request $request)
     {
-        $user = auth('api')->user()->load('wallet');
+        $user = auth('api')->user()->load('wallet', 'transactions');
 
         if (!$user) {
             return response()->json([
@@ -68,7 +70,7 @@ class AuthController extends Controller
 
         // إضافة رابط الصورة الكامل
         $user->image = $user->image ? asset('storage/' . $user->image) : null;
-
+        $lastTransaction = $user->transactions()->latest()->first();
         return response()->json([
             'status' => 200,
             'message' => "User retrieved successfully",
@@ -77,8 +79,10 @@ class AuthController extends Controller
                 'name' => $user->name,
                 'email' => $user->email,
                 'phone' => $user->phone,
+                'role'=> $user->role,
                 'image' => $user->image_url, // Using the accessor
                 'points' => $user->wallet?->points ?? 0, // If no wallet, return 0
+                'last_transaction' => $lastTransaction
             ]
         ]);
     }
@@ -123,7 +127,46 @@ class AuthController extends Controller
         $user->image = $user->image ? asset('storage/' . $user->image) : null;
         return response()->json([
             'message' => 'Profile updated successfully!',
-            'user' => $user
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'phone' => $user->phone,
+                'role'=> $user->role
+
+            ]
+        ], 200);
+    }
+    public  function UpdateProfileimage(Request $request)
+    {
+// استرجاع المستخدم من الـ JWT
+        $user = JWTAuth::user();
+
+        // التحقق من البيانات المدخلة
+        $validator = Validator::make($request->all(), [
+            'image' => 'sometimes|image|mimes:jpeg,png,jpg,gif|max:2048'
+        ]);
+
+        // تحديث الصورة الشخصية
+        if ($request->hasFile('image')) {
+            // حذف الصورة القديمة إن وجدت
+            if ($user->image) {
+                Storage::disk('public')->delete($user->image);
+            }
+
+            // حفظ الصورة الجديدة
+            $path = $request->file('image')->store('profile_images', 'public');
+            $user->image = $path;
+        }
+
+        // حفظ التغييرات
+        $user->save();
+        $user->image = $user->image ? asset('storage/' . $user->image) : null;
+        return response()->json([
+            'message' => 'Image updated successfully!',
+            'user' =>[
+                'image' =>$user->imageUrl,
+            ]
         ], 200);
     }
 public function logout(Request $request)

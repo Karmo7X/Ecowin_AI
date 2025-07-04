@@ -14,6 +14,31 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 class CartController extends Controller
 {
 
+    
+
+
+     public function index(Request $request){  
+
+        $user = JWTAuth::user();
+
+        // Fetch the cart for the authenticated user
+        $cart = Cart::where('user_id', $user->id)->with('cartItems.product')->first();
+
+        if (!$cart) {
+            return response()->json(['message' => 'Cart is empty'], 404);
+        }
+
+        // Calculate total price
+        $cart->total_price = $cart->cartItems->sum(fn($item) => $item->quantity * $item->price);
+
+        return response()->json([
+            'message' => 'Cart retrieved successfully',
+            'cart' => $cart,
+        ], 200);
+     }
+
+
+      
     /**
      * Store a newly created resource in storage.
      */
@@ -77,96 +102,115 @@ class CartController extends Controller
             DB::rollBack();
             return response()->json(['error' => $e->getMessage()], 500);
         }
-        $user = JWTAuth::parseToken()->authenticate();
+        // $user = JWTAuth::parseToken()->authenticate();
 
     }
 
-    ///////////////////////////////////////////////////////////
 
-    // public function updateCartItem(Request $request, $cartItemId)
-    // {
-    //     $user = JWTAuth::user();
-
-
-    //     $validator = Validator::make($request->all(), [
-    //         'action' => 'required|in:decrease,remove,increase',
-    //     ]);
-
-    //     if ($validator->fails()) {
-    //         return response()->json(['errors' => $validator->errors()], 422);
-    //     }
-
-
-    //     $cartItem = CartItem::whereHas('cart', function ($query) use ($user) {
-    //         $query->where('user_id', $user->id);
-    //     })->where('id', $cartItemId)->first();
-
-    //     if (!$cartItem) {
-    //         return response()->json(['message' => 'Cart item not found'], 404);
-    //     }
-
-    //     if ($request->action === 'decrease') {
-    //         if ($cartItem->quantity > 1) {
-    //             $cartItem->decrement('quantity');
-    //         } else {
-    //             $cartItem->delete();
-    //         }
-    //     } elseif ($request->action === 'remove') {
-    //         $cartItem->delete();
-    //     }
-
-
-    //     $cart = Cart::where('user_id', $user->id)->with('items')->first();
-    //     if ($cart) {
-    //         $cart->total_price = $cart->items->sum(fn($item) => $item->quantity * $item->price);
-    //         $cart->save();
-    //     }
-
-    //     return response()->json([
-    //         'message' => 'Cart item updated successfully',
-    //         'cart' => $cart,
-    //     ]);
-    // }
-    public function updateCartItem(Request $request, $cartItemId)
+    public function update(Request $request)
 {
     $user = JWTAuth::user();
 
-    // التحقق من صحة البيانات
-    $validator = Validator::make($request->all(), [
-        'action' => 'required|in:increase,decrease,remove',
-    ]);
+    // Validate request data
+     $validator = Validator::make($request->all(), [
+            'products' => 'required|array',
+            'products.*.product_id' => 'required|exists:products,id',
+            'products.*.quantity' => 'required|integer|min:1',
+        ]);
 
-    if ($validator->fails()) {
-        return response()->json(['errors' => $validator->errors()], 422);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+
+    try {
+        $user = JWTAuth::user();
+
+        // Get user's cart
+        $cart = Cart::where('user_id', $user->id)->first();
+
+        if (!$cart) {
+            return response()->json(['error' => 'Cart not found'], 404);
+        }
+
+        foreach ($request->products as $productData) {
+            $cartItem = CartItem::where('cart_id', $cart->id)
+                ->where('product_id', $productData['product_id'])
+                ->first();
+
+            if ($cartItem) {
+                // Update the quantity
+                $cartItem->quantity = $productData['quantity'];
+                $cartItem->save();
+            }
+        }
+
+        // Recalculate total price
+        $cart->load('cartItems');
+        $cart->total_price = $cart->cartItems->sum(fn($item) => $item->quantity * $item->price);
+        $cart->save();
+
+        return response()->json([
+            'message' => 'Cart updated successfully',
+            'cart' => $cart->load('cartItems')
+        ], 200);
+
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
     }
-
-
-    $cartItem = CartItem::whereHas('cart', fn($query) => $query->where('user_id', $user->id))
-        ->where('id', $cartItemId)
-        ->first();
-
-    if (!$cartItem) {
-        return response()->json(['message' => 'Cart item not found'], 404);
-    }
-
-
-    match ($request->action) {
-        'increase' => $cartItem->increment('quantity'),
-        'decrease' => $cartItem->quantity > 1 ? $cartItem->decrement('quantity') : $cartItem->delete(),
-        'remove'   => $cartItem->delete(),
-    };
-
-
-    $cart = Cart::where('user_id', $user->id)->first();
-    if ($cart) {
-        $cart->refreshTotalPrice();
-    }
-
-    return response()->json([
-        'message' => 'Cart item updated successfully',
-        'cart' => $cart->load('cartItems'),
-    ]);
 }
+
+
+    public function delete(Request $request)
+    {
+        $user = JWTAuth::user();
+
+        // Fetch the cart for the authenticated user
+        $cart = Cart::where('user_id', $user->id)->first();
+
+        if (!$cart) {
+            return response()->json(['message' => 'Cart is empty'], 404);
+        }
+
+        // Delete all cart items
+        $cart->cartItems()->delete();
+
+        // Optionally, delete the cart itself
+        $cart->delete();
+
+        return response()->json(['message' => 'Cart cleared successfully'], 200);
+    }
+    public function removeItem(Request $request, $itemId)
+    {
+        $user = JWTAuth::user();
+
+        // Fetch the cart for the authenticated user
+        $cart = Cart::where('user_id', $user->id)->first();
+
+        if (!$cart) {
+            return response()->json(['message' => 'Cart is empty'], 404);
+        }
+
+        // Find the cart item to be removed
+        $cartItem = CartItem::where('cart_id', $cart->id)->where('id', $itemId)->first();
+
+        if (!$cartItem) {
+            return response()->json(['message' => 'Cart item not found'], 404);
+        }
+
+        // Delete the cart item
+        $cartItem->delete();
+
+        // Recalculate total price
+        $cart->load('cartItems');
+        $cart->total_price = $cart->cartItems->sum(fn($item) => $item->quantity * $item->price);
+        $cart->save();
+
+        return response()->json([
+            'message' => 'Cart item removed successfully',
+            'cart' => $cart,
+        ], 200);
+    }
 
 
 

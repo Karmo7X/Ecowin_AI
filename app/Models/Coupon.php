@@ -15,7 +15,9 @@ class Coupon extends Model
         'price',
         "brand_id",
         'user_id',
-        "expires_at"
+        "expires_at",
+        'redeemed_at',
+        
     ];
 
     protected $casts = [

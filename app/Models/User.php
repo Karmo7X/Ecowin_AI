@@ -36,10 +36,12 @@ class User extends Authenticatable implements
     public function getImageUrlAttribute()
     {
         if (!empty($this->image)) {
-            return url('storage/' . $this->image);
+            return url($this->image);
         }
 
-        return url('/images/default-avatar.png');
+
+        // Return external URL directly without using `url()`
+        return url('images/default.webp');
     }
 
 
@@ -119,6 +121,10 @@ class User extends Authenticatable implements
     public function agent()
     {
         return $this->hasOne(Agent::class);
+    }
+    public function donations()
+    {
+        return $this->hasMany(Donation::class);
     }
     protected static function booted()
     {

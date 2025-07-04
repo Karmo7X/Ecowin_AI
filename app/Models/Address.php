@@ -13,7 +13,9 @@ class Address extends Model
         'governate',
         'city',
         'street',
-        'user_id'
+        'user_id',
+        'building_no',
+        'phone'
     ];
 
     public function user()
@@ -25,4 +27,8 @@ class Address extends Model
     {
         return $this->hasMany(Order::class);
     }
+    public function donations()
+{
+    return $this->hasMany(Donation::class);
+}
 }

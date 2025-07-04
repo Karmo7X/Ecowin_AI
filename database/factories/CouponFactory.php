@@ -20,7 +20,7 @@ class CouponFactory extends Factory
             'price' => $this->faker->randomFloat(2, 50, 500),
 //            'user_id' => 1,
             'brand_id' => 1, // Generates a fake image URL
-            'expires_at' => Carbon::now()->addDays(30),
+            'expires_at' => Carbon::now()->addDays(90),
             'created_at' => now(),
             'updated_at' => now(),
         ];

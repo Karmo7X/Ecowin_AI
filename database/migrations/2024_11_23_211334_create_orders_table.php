@@ -13,14 +13,13 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->unsignedBigInteger('agent_id')->nullable();
             $table->unsignedBigInteger('address_id');
             $table->integer('points');
             $table->enum('status', ['pending', 'completed', 'cancelled']);
             $table->timestamps();
 
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('agent_id')->references('id')->on('agents')->onDelete('set null');
             $table->foreign('address_id')->references('id')->on('addresses')->onDelete('cascade');
         });

@@ -17,8 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('product_id');
             $table->integer('quantity');
             $table->decimal('price', 10, 2);
-//            $table->decimal('weight_price', 10, 2);
-//            $table->boolean('ai_product')->default(false);
+
             $table->timestamps();
 
             $table->foreign('cart_id')->references('id')->on('carts')->onDelete('cascade');

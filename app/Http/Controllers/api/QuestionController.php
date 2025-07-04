@@ -13,64 +13,46 @@ class QuestionController extends Controller
     public function index(Request $request)
     {
         $perpage = $request->input('perpage', 10);
-        $questions =Question::select(
-            'id',
-            'question_' . app()->getLocale() . ' as question',
-            'answer_' . app()->getLocale() . ' as answer',
-        )->paginate($perpage);
+        $searchTerm = $request->input('search');
+        $locale = app()->getLocale();
 
-        if ($questions->isEmpty()) {
-            return response()->json([
-                "status" => 404,
-                "message" => "Questions not found",
-            ],404);
+        $questionsQuery = Question::select(
+            'id',
+            "question_{$locale} as question",
+            "answer_{$locale} as answer"
+        );
+
+        if ($searchTerm) {
+            $questionsQuery->where(function($query) use ($searchTerm, $locale) {
+                $query->where("question_{$locale}", 'like', '%' . $searchTerm . '%')
+                      ->orWhere("answer_{$locale}", 'like', '%' . $searchTerm . '%');
+            });
         }
-       return response()->json([
-           'message' => 'Questions returned successfully',
-           'status' => 200,
-           'data' => $questions->items(), // Return the paginated items
-           'meta' => [
-               'total' => $questions->total(),
-               'current_page' => $questions->currentPage(),
-               'last_page' => $questions->lastPage(),
-               'per_page' => $questions->perPage(),
-           ]
-       ],200);
+
+        $questions = $questionsQuery->paginate($perpage);
+
+        // if ($questions->isEmpty()) {
+        //     return response()->json([
+        //         'message' => 'Questions not found',
+        //         'status' => 404
+        //     ], 404);
+        // }
+
+        return response()->json([
+            'message' => 'Questions returned successfully',
+            'status' => 200,
+            'data' => $questions->items(),
+            'meta' => [
+                'total' => $questions->total(),
+                'current_page' => $questions->currentPage(),
+                'last_page' => $questions->lastPage(),
+                'per_page' => $questions->perPage(),
+            ]
+        ], 200);
 
     }
 
-    public function question_search(Request $request)
-    {
-        $perpage = $request->input('perpage', 10);
-        $search_term = $request->input('search');
-        $questions = Question::select(
-            'id',
-            'question_' . app()->getLocale() . ' as question',
-            'answer_' . app()->getLocale() . ' as answer'
-        )
-            ->where('question_' . app()->getLocale(), 'like', '%' . $search_term . '%')
-            ->orWhere('answer_' . app()->getLocale(), 'like', '%' . $search_term . '%')
-            ->paginate($perpage);
-
-        if ($questions->isEmpty()) {
-            return response()->json([
-                'message' => 'Questions not found',
-                'status' => 404
-            ], 404);
-        } else {
-            return response()->json([
-                'message' => 'Questions returned successfully',
-                'status' => 200,
-                'data' => $questions->items(), // Return the paginated items
-                'meta' => [
-                    'total' => $questions->total(),
-                    'current_page' => $questions->currentPage(),
-                    'last_page' => $questions->lastPage(),
-                    'per_page' => $questions->perPage(),
-                ]
-            ], 200);
-        }
-    }
+  
 
 
 }
