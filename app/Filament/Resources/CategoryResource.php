@@ -47,7 +47,7 @@ class CategoryResource extends Resource
                     ->schema([
                         Forms\Components\Section::make()
                             ->schema([
-                                Forms\Components\TextInput::make("name_ar")->maxValue(50)->required(),
+                                // Forms\Components\TextInput::make("name_ar")->maxValue(50)->required(),
                                 Forms\Components\TextInput::make("name_en")->maxValue(50)->required(),
                                 Forms\Components\FileUpload::make('image')
                                     ->directory('categories')
@@ -68,7 +68,7 @@ class CategoryResource extends Resource
             ->columns([
 
                 Tables\Columns\ImageColumn::make("image"),
-                Tables\Columns\TextColumn::make("name_ar")->searchable()->sortable(),
+                // Tables\Columns\TextColumn::make("name_ar")->searchable()->sortable(),
                 Tables\Columns\TextColumn::make("name_en")->searchable()->sortable(),
                 //
             ])

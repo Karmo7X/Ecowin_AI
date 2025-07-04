@@ -7,6 +7,7 @@ use App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Models\Order;
 use App\Models\Agent;
+use App\Models\Transaction;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -15,6 +16,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Enums\OrderStatusEnum as EnumsOrderStatusEnum;
+use App\Enums\TransactionTypeEnum as EnumsTransactionTypeEnum;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Actions\Action as ActionsAction;
 use Filament\Notifications\Notification;
@@ -33,10 +35,12 @@ class OrderResource extends Resource
     // {
     //     return auth()->user()?->role === "agent"; //هام جدا في اخفاء الريسورس عن الايجنت role
     // }
-    public static function canEdit($record): bool
-    {
-        return !auth()->user()->role === "admin"; // السماح بالتعديل فقط لغير الـ Admin
-    }
+
+
+    // public static function canEdit($record): bool
+    // {
+    //     return !auth()->user()->role === "admin"; // السماح بالتعديل فقط لغير الـ Admin
+    // }
     public static function getNavigationBadge(): ?string
     {
         if (!auth()->check()) {
@@ -64,7 +68,7 @@ class OrderResource extends Resource
                     ])->required()->default("pending"),
                     Forms\Components\Select::make("address_id")
                         ->relationship('address', "city")->label("city")->required(),
-                    Forms\Components\TextInput::make("points")->numeric()->required(),
+                    Forms\Components\TextInput::make("points")->numeric()->required()->minvalue(0),
                 ])
             ]);
     }
@@ -80,7 +84,9 @@ class OrderResource extends Resource
                 Tables\Columns\TextColumn::make('agent.user.name') // جلب اسم الوكيل المرتبط
                     ->label('Agent Name')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->visible(auth()->user()->role === 'admin')
+                    ->placeholder('No assigned agent'),
 
 
             ])
@@ -90,68 +96,83 @@ class OrderResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\Action::make("استلام الطلب")
+                Tables\Actions\Action::make("Receive Order") // Changed action name
                     ->icon("heroicon-m-check")
                     ->color("success")
                     ->action(function (Order $order) {
-                        $userId = auth()->id(); // جلب user_id للمستخدم الحالي
-
-                        // البحث عن agent مرتبط بهذا المستخدم
+                        $userId = auth()->id();
                         $agent = Agent::where("user_id", $userId)->first();
+
+                        if (!$agent) {
+                            Notification::make()
+                                ->title("Error: Agent not found for current user.")
+                                ->danger()
+                                ->send();
+                            return; // Stop execution if agent not found
+                        }
+
                         $order->agent_id = $agent->id;
                         $order->save();
                         Notification::make()
-                            ->title("تم استلام الطلب")
+                            ->title("Order received") // Changed notification title
                             ->success()
                             ->send();
                     })
                     ->visible(
                         fn(Order $order) =>
-                        $order->status === EnumsOrderStatusEnum::PENDING->value &&
-                            auth()->user()->role === "agent" && $order->agent_id == null
+                        $order->status === OrderStatusEnum::PENDING->value &&
+                            auth()->user()->role === "agent" &&
+                            $order->agent_id == null
                     ),
-
                 Tables\Actions\Action::make("Cancel Order")
                     ->icon("heroicon-m-trash")
                     ->color("danger")
                     ->action(function (Order $order) {
-                        $order->status = EnumsOrderStatusEnum::CANCELLED->value;
+                        $order->status = OrderStatusEnum::CANCELLED->value;
                         $order->save();
                         Notification::make()->title("Order Cancelled")->success()->send();
                     })->visible(
                         fn(Order $order) =>
-                        $order->status === EnumsOrderStatusEnum::PENDING->value &&
+                        $order->status === OrderStatusEnum::PENDING->value &&
                             optional($order->agent)->user_id === auth()->id()
                     ),
-                Tables\Actions\Action::make("completed")
+                Tables\Actions\Action::make("Complete Order") // Changed action name
                     ->icon("heroicon-o-check")
                     ->color("success")
                     ->action(function (Order $order) {
-                        $order->status = EnumsOrderStatusEnum::COMPLETED->value;
+                        $order->status = OrderStatusEnum::COMPLETED->value;
                         $order->save();
+
+                        Transaction::create([
+                            'user_id' => $order->user_id,
+                            'amount' => $order->points,
+                            'type' => EnumsTransactionTypeEnum::CREDIT->value,
+                        ]);
+
                         Notification::make()->title("Order completed")->success()->send();
                     })->visible(
                         fn(Order $order) =>
-                        $order->status === EnumsOrderStatusEnum::PENDING->value &&
+                        $order->status === OrderStatusEnum::PENDING->value &&
                             optional($order->agent)->user_id === auth()->id()
                     ),
-
-                Tables\Actions\Action::make("Edit points")
-                    ->icon("heroicon-m-pencil-square")->form([
-                        Forms\Components\TextInput::make("points")->numeric()->default(function (Order $order) {
-                            return $order->points;
-                        })
-                    ])->action(function (Order $order, $data) {
+                Tables\Actions\Action::make("Edit Points") // Changed action name
+                    ->icon("heroicon-m-pencil-square")
+                    ->form([
+                        Forms\Components\TextInput::make("points")
+                            ->numeric()
+                            ->default(fn(Order $order) => $order->points)
+                            ->minValue(0)
+                            ->required(),
+                    ])
+                    ->action(function (Order $order, $data) {
                         $order->points = $data["points"];
                         $order->save();
-                        Notification::make()->title("Update points")->success()->send();
+                        Notification::make()->title("Points Updated")->success()->send();
                     })->visible(
                         fn(Order $order) =>
-                        $order->status === EnumsOrderStatusEnum::PENDING->value &&
+                        $order->status === OrderStatusEnum::PENDING->value &&
                             optional($order->agent)->user_id === auth()->id()
                     ),
-
-
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
