@@ -39,8 +39,10 @@ class QuestionResource extends Resource
             ->schema([
                 Forms\Components\Section::make()->schema([
                     // Forms\Components\TextInput::make("question_ar")->maxValue(255)->required(),
+                    Forms\Components\Hidden::make("question_ar"),
                     Forms\Components\TextInput::make("question_en")->maxValue(255)->required(),
                     // Forms\Components\TextInput::make("answer_ar")->maxValue(255)->required(),
+                    Forms\Components\Hidden::make("answer_ar"),
                     Forms\Components\TextInput::make("answer_en")->maxValue(255)->required(),
                 ])
             ]);

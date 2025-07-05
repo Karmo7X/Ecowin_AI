@@ -22,4 +22,13 @@ class EditProduct extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+     protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        $data['name_ar'] = $data['name_en']; 
+        return $data;
+    }
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index'); 
+    }
 }

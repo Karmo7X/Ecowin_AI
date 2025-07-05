@@ -15,4 +15,13 @@ class CreateProduct extends CreateRecord
     {
         Cache::flush(); // أو Cache::forget('products_...')
     }
+     protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        $data['name_ar'] = $data['name_en']; 
+        return $data;
+    }
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index'); 
+    }
 }

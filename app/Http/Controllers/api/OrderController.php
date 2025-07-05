@@ -110,17 +110,49 @@ class OrderController extends Controller
     {
         $user = Auth::user();
 
-        $order = Order::where('user_id', $user->id)
+        $orders = Order::where('user_id', $user->id)
             ->with('orderItems.product')
-            ->first();
+            ->get();
 
-        if (!$order || $order->orderItems->isEmpty()) {
+        if ($orders->isEmpty()) {
             return response()->json(['message' => 'No orders found.'], 404);
         }
 
         return response()->json([
             'message' => 'Orders retrieved successfully.',
-            'order' => $order
+            'orders' => $orders->map(function ($order) {
+                return [
+                    'id' => $order->id,
+                    'user_id' => $order->user_id,
+                    'agent_id' => $order->agent_id,
+                    'address_id' => $order->address_id,
+                    'points' => (int) $order->points,
+                    'status' => $order->status,
+                    'created_at' => $order->created_at,
+                    'updated_at' => $order->updated_at,
+                    'order_items' => $order->orderItems->map(function ($item) {
+                        return [
+                            'id' => $item->id,
+                            'order_id' => $item->order_id,
+                            'product_id' => $item->product_id,
+                            'quantity' => $item->quantity,
+                            'total_price' => (int) $item->total_price, // ✅ هنا التحويل
+                            'created_at' => $item->created_at,
+                            'updated_at' => $item->updated_at,
+                            'product' => [
+                                'id' => $item->product->id,
+                                'name_ar' => $item->product->name_ar,
+                                'name_en' => $item->product->name_en,
+                                'price' => (int) $item->product->price,
+                                'category_id' => $item->product->category_id,
+                                'image' => $item->product->image ? url('storage/' . $item->product->image) : null,
+                                'created_at' => $item->product->created_at,
+                                'updated_at' => $item->product->updated_at,
+                            ],
+                        ];
+                    }),
+                ];
+            }),
         ], 200);
     }
 }

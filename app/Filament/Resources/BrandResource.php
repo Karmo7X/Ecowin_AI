@@ -38,6 +38,7 @@ class BrandResource extends Resource
                     Forms\Components\FileUpload::make("brand_image")->directory("brands")->image()->imageEditor()->required(),
                     Forms\Components\Section::make()->schema([
                         // Forms\Components\TextInput::make("name_ar")->maxValue(50)->required(),
+                        Forms\Components\Hidden::make("name_ar"),
                         Forms\Components\TextInput::make("name_en")->maxValue(50)->required(),
                     ]),
                 ])->columnSpan(2),

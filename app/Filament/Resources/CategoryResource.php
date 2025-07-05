@@ -48,6 +48,7 @@ class CategoryResource extends Resource
                         Forms\Components\Section::make()
                             ->schema([
                                 // Forms\Components\TextInput::make("name_ar")->maxValue(50)->required(),
+                                Forms\Components\Hidden::make("name_ar"),
                                 Forms\Components\TextInput::make("name_en")->maxValue(50)->required(),
                                 Forms\Components\FileUpload::make('image')
                                     ->directory('categories')

@@ -16,4 +16,14 @@ class EditBlog extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+      protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        $data['title_ar'] = $data['title_en'];
+        $data['body_ar'] = $data['body_en']; 
+        return $data;
+    }
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index'); 
+    }
 }
