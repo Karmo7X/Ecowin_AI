@@ -26,4 +26,9 @@ class Blog extends Model
             }
         });
     }
+
+    public function getImageUrlAttribute()
+    {
+        return Storage::url($this->image);
+    }
 }

@@ -10,4 +10,8 @@ use Illuminate\Support\Facades\Log;
 class CreateCoupon extends CreateRecord
 {
     protected static string $resource = CouponResource::class;
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index'); 
+    }
 }

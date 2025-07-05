@@ -96,6 +96,7 @@ class OrderResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ViewAction::make(),
+                Tables\Actions\DeleteAction::make(),
                 Tables\Actions\Action::make("Receive Order") // Changed action name
                     ->icon("heroicon-m-check")
                     ->color("success")

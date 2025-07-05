@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::create('coupons', function (Blueprint $table) {
             $table->id();
             $table->string('code')->unique();
-            $table->decimal('discount_value', 10, 2);
-            $table->decimal('price', 10, 2);
+            $table->integer('discount_value');
+            $table->integer('price');
             $table->dateTime('expires_at')->nullable(); // when it's no longer usable
             $table->dateTime('redeemed_at')->nullable(); // when user redeems it
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade')->nullable();
             $table->foreignId('brand_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });

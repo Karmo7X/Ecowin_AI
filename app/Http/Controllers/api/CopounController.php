@@ -42,9 +42,9 @@ class CopounController extends Controller
             return [
                 'brand_id' => $first->brand_id,
                 'brand_name' => $locale === 'ar' ? $first->brand->name_ar : $first->brand->name_en,
-                'brand_image' => $first->brand->brand_image ?? null,
-                'discount_value' => number_format($first->discount_value, 2),
-                'price' => number_format($first->price, 2),
+                'brand_image' => $first->brand->brand_image ? url('storage/' . $first->brand->brand_image) : null,
+                'discount_value' =>$first->discount_value,
+                'price' => $first->price,
 //                'coupons' => [
 //                    [
 //                        'id' => $first->id,
@@ -181,7 +181,7 @@ class CopounController extends Controller
                 'price' => $coupon->price,
                 'brand_id' => $coupon->brand_id,
                 'brand_name' => $locale === 'ar' ? $coupon->brand->name_ar : $coupon->brand->name_en,
-                'brand_image' => $coupon->brand->brand_image ?? null,
+                'brand_image' => $coupon->brand->brand_image ? url('storage/' . $coupon->brand->brand_image) : null,
             ];
         });
 

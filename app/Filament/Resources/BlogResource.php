@@ -39,6 +39,7 @@ class BlogResource extends Resource
                 //     ->label('Title ar')
                 //     ->required()
                 //     ->maxLength(255),
+                Forms\Components\Hidden::make("title_ar"),
                 Forms\Components\TextInput::make('title_en')
                     ->label('Title en')
                     ->required()
@@ -47,9 +48,11 @@ class BlogResource extends Resource
                 // Forms\Components\Textarea::make('body_ar')
                 //     ->label('Content ar')
                 //     ->required(),
+                Forms\Components\Hidden::make('body_ar'),
                 Forms\Components\Textarea::make('body_en')
                     ->label('Content en')
-                    ->required(),
+                    ->required()
+                    ->maxLength(1000),
 
                 Forms\Components\FileUpload::make('image')
                     ->label('Image')

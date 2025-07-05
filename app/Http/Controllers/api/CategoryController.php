@@ -14,15 +14,21 @@ class CategoryController extends Controller
      */
     public function index(Request $request)
     {
-//        $perpage = $request->input('perpage', 10);
-        // Get the requested language (default to English)
+        $categories = Category::select('id', 'name_' . app()->getLocale() . ' as name', 'image')->get();
 
-        $categories = Category::select('id', 'name_' . app()->getLocale(). ' as name')->get();
+        $data = $categories->map(function ($category) {
+            return [
+                'id' => $category->id,
+                'name' => $category->name,
+                'image' => $category->image,
+                'image_url' => $category->image ? url('storage/' . $category->image) : null,
+            ];
+        });
+
         return response()->json([
             'message' => 'categories return successfully',
             'status' => 200,
-            'data' => $categories,
-
-        ],200);
+            'data' => $data,
+        ], 200);
     }
 }
