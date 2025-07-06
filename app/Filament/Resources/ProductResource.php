@@ -40,12 +40,12 @@ class ProductResource extends Resource
                 Forms\Components\Section::make()->schema([
                     Forms\Components\FileUpload::make("image")->directory("products")->image()->imageEditor()->required(),
                     // Forms\Components\TextInput::make("name_ar")->maxValue(50)->required(),
-                     Forms\Components\Hidden::make("name_ar"),
-                    Forms\Components\TextInput::make("name_en")->maxValue(50)->required(),
+                    Forms\Components\Hidden::make("name_ar"),
+                    Forms\Components\TextInput::make("name_en")->label("Name")->maxValue(50)->required(),
                     // Forms\Components\Select::make("category_id")
                     //     ->relationship('category', "name_ar")->label("category ar"),
                     Forms\Components\Select::make("category_id")
-                        ->relationship('category', "name_en")->label("category en"),
+                        ->relationship('category', "name_en")->label("Category"),
                     Forms\Components\TextInput::make("price")->numeric()->required()->minvalue(0),
                 ])
             ]);
@@ -57,7 +57,7 @@ class ProductResource extends Resource
             ->columns([
                 Tables\Columns\ImageColumn::make("image"),
                 // Tables\Columns\TextColumn::make("name_ar")->searchable()->sortable(),
-                Tables\Columns\TextColumn::make("name_en")->searchable()->sortable(),
+                Tables\Columns\TextColumn::make("name_en")->label("Name")->searchable()->sortable(),
                 // Tables\Columns\TextColumn::make("category.name_ar")->searchable()->sortable()->toggleable(),
                 Tables\Columns\TextColumn::make("category.name_en")->searchable()->sortable()->toggleable(),
                 Tables\Columns\TextColumn::make("price")->sortable()->toggleable(),

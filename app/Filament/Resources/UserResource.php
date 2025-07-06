@@ -20,8 +20,8 @@ class UserResource extends Resource
     protected static ?string $model = User::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
- 
-     public static function shouldRegisterNavigation(): bool
+
+    public static function shouldRegisterNavigation(): bool
     {
         return auth()->user()?->role === "admin"; //هام جدا في اخفاء الريسورس عن الايجنت role
     }
@@ -50,8 +50,10 @@ class UserResource extends Resource
                 Forms\Components\TextInput::make('password')
                     ->label('Password')
                     ->password()
-                    ->required()
-                    ->dehydrateStateUsing(fn($state) => Hash::make($state)),
+                    ->revealable() // <--- الإضافة الأولى: أيقونة العين
+                    ->required(fn(string $context): bool => $context === 'create') // <--- الإضافة الثانية: مطلوب فقط عند الإنشاء
+                    ->dehydrateStateUsing(fn($state) => Hash::make($state))
+                    ->dehydrated(fn($state) => filled($state)), // <--- الإضافة الثالثة: لا يحفظ الهاش إذا كان الحقل فارغاً في التعديل
 
 
                 Forms\Components\Select::make("role")->options([
@@ -59,7 +61,17 @@ class UserResource extends Resource
                     "agent" => EnumsUserRoleEnum::AGENT->value,
                     "admin" => EnumsUserRoleEnum::ADMIN->value,
 
-                ])->required()->default("user"),
+                ])->required()->default("user")->reactive(),
+
+                Forms\Components\TextInput::make('assigned_area')
+                    ->label('Assigned Area')
+                    ->placeholder('Enter the assigned area for this agent') // تغيير النص التوضيحي
+                    // سيظهر هذا الحقل فقط إذا كانت قيمة 'role' هي 'agent'
+                    ->hidden(fn(Forms\Get $get): bool => $get('role') !== 'agent')
+                    // سيصبح هذا الحقل مطلوبًا فقط إذا كانت قيمة 'role' هي 'agent'
+                    ->required(fn(Forms\Get $get): bool => $get('role') === 'agent'),
+
+
 
 
             ]);

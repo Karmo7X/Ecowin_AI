@@ -39,7 +39,7 @@ class BrandResource extends Resource
                     Forms\Components\Section::make()->schema([
                         // Forms\Components\TextInput::make("name_ar")->maxValue(50)->required(),
                         Forms\Components\Hidden::make("name_ar"),
-                        Forms\Components\TextInput::make("name_en")->maxValue(50)->required(),
+                        Forms\Components\TextInput::make("name_en")->label("Name")->maxValue(50)->required(),
                     ]),
                 ])->columnSpan(2),
             ]);
@@ -51,7 +51,7 @@ class BrandResource extends Resource
             ->columns([
                 Tables\Columns\ImageColumn::make("brand_image")->label("image"),
                 // Tables\Columns\TextColumn::make("name_ar")->searchable()->sortable(),
-                Tables\Columns\TextColumn::make("name_en")->searchable()->sortable(),
+                Tables\Columns\TextColumn::make("name_en")->searchable()->sortable()->label("Name"),
             ])
             ->filters([
                 //

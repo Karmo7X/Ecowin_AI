@@ -64,7 +64,7 @@ class CouponResource extends Resource
                 // Forms\Components\Select::make("brand_id")
                 //     ->relationship('brand', "name_ar")->label("brand ar"),
                 Forms\Components\Select::make("brand_id")
-                    ->relationship('brand', "name_en")->label("brand en")->required(),
+                    ->relationship('brand', "name_en")->label("brand")->required(),
 
                 Forms\Components\DateTimePicker::make('expires_at')
                     ->label('Expiration Date & Time')

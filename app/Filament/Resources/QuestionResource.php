@@ -40,10 +40,10 @@ class QuestionResource extends Resource
                 Forms\Components\Section::make()->schema([
                     // Forms\Components\TextInput::make("question_ar")->maxValue(255)->required(),
                     Forms\Components\Hidden::make("question_ar"),
-                    Forms\Components\TextInput::make("question_en")->maxValue(255)->required(),
+                    Forms\Components\TextInput::make("question_en")->label("Question")->maxValue(255)->required(),
                     // Forms\Components\TextInput::make("answer_ar")->maxValue(255)->required(),
                     Forms\Components\Hidden::make("answer_ar"),
-                    Forms\Components\TextInput::make("answer_en")->maxValue(255)->required(),
+                    Forms\Components\TextInput::make("answer_en")->label("Answer")->maxValue(255)->required(),
                 ])
             ]);
     }
@@ -53,9 +53,9 @@ class QuestionResource extends Resource
         return $table
             ->columns([
                 // Tables\Columns\TextColumn::make("question_ar")->searchable()->sortable(),
-                Tables\Columns\TextColumn::make("question_en")->searchable()->sortable(),
+                Tables\Columns\TextColumn::make("question_en")->label("Question")->searchable()->sortable(),
                 // Tables\Columns\TextColumn::make("answer_ar")->sortable(),
-                Tables\Columns\TextColumn::make("answer_en")->sortable(),
+                Tables\Columns\TextColumn::make("answer_en")->label("Answer")->sortable(),
             ])
             ->filters([
                 // يمكن إضافة فلترة هنا إذا لزم الأمر
