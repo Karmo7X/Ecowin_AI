@@ -17,10 +17,10 @@ class BlogResource extends Resource
 {
     protected static ?string $model = Blog::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-newspaper'; // أيقونة الصحيفة تناسب المقالات
+    protected static ?string $navigationIcon = 'heroicon-o-newspaper';
     protected static ?int $navigationSort = 3;
-    protected static ?string $navigationGroup = 'Content'; // فصل المدونة في مجموعة أخرى للمحتوى
-    protected static ?string $navigationLabel = 'Blogs'; // التسمية ثابتة
+    protected static ?string $navigationGroup = 'Content';
+    protected static ?string $navigationLabel = 'Blogs';
 
     public static function shouldRegisterNavigation(): bool
     {
@@ -35,22 +35,16 @@ class BlogResource extends Resource
     {
         return $form
             ->schema([
-                // Forms\Components\TextInput::make('title_ar')
-                //     ->label('Title ar')
-                //     ->required()
-                //     ->maxLength(255),
                 Forms\Components\Hidden::make("title_ar"),
                 Forms\Components\TextInput::make('title_en')
-                    ->label('Title en')
+                    ->label('Title')
                     ->required()
                     ->maxLength(255),
 
-                // Forms\Components\Textarea::make('body_ar')
-                //     ->label('Content ar')
-                //     ->required(),
+
                 Forms\Components\Hidden::make('body_ar'),
                 Forms\Components\Textarea::make('body_en')
-                    ->label('Content en')
+                    ->label('Content')
                     ->required()
                     ->maxLength(1000),
 
@@ -60,7 +54,6 @@ class BlogResource extends Resource
                     ->directory('blogs')
                     ->visibility('public')
                     ->nullable(),
-                //
             ]);
     }
 
@@ -68,13 +61,10 @@ class BlogResource extends Resource
     {
         return $table
             ->columns([
-                // Tables\Columns\TextColumn::make('title_ar')->label('Title ar')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('title_en')->label('Title en')->sortable()->searchable(),
-                // Tables\Columns\TextColumn::make('body_ar')->label('Content ar')->limit(50),
-                Tables\Columns\TextColumn::make('body_en')->label('Content en')->limit(50),
+                Tables\Columns\TextColumn::make('title_en')->label('Title')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('body_en')->label('Content')->limit(50),
                 Tables\Columns\ImageColumn::make('image'),
                 Tables\Columns\TextColumn::make('created_at')->label('Created At')->date(),
-                //
             ])
             ->filters([
 
