@@ -7,6 +7,7 @@ use App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Models\Order;
 use App\Models\Agent;
+use App\Models\Address;
 use App\Models\Transaction;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -27,48 +28,64 @@ class OrderResource extends Resource
     protected static ?string $model = Order::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    // public static function shouldRegisterNavigation(): bool
-    // {
-    //     return auth()->user()?->role === "agent"; //هام جدا في اخفاء الريسورس عن الايجنت role
-    // }
-    // public static function canAccess(): bool
-    // {
-    //     return auth()->user()?->role === "agent"; //هام جدا في اخفاء الريسورس عن الايجنت role
-    // }
 
-
-    // public static function canEdit($record): bool
-    // {
-    //     return !auth()->user()->role === "admin"; // السماح بالتعديل فقط لغير الـ Admin
-    // }
     public static function getNavigationBadge(): ?string
     {
         if (!auth()->check()) {
-            return null; // إذا لم يكن هناك مستخدم مسجل، لا تُرجع أي قيمة
+            return null; // If there is no logged-in user, return null
         }
 
         if (auth()->user()->role !== 'admin') {
-            return null; // منع المستخدم غير المسؤول من رؤية الشارة
+            return null; // Prevent non-admin users from seeing the badge
         }
 
         return static::getModel()::count();
+    }
+    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        // Only allow "admin" to edit requests
+        return auth()->user()->role === "admin";
     }
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-
                 Forms\Components\Section::make()->schema([
+                    // User selection field
                     Forms\Components\Select::make("user_id")
-                        ->relationship('user', "name")->label("user"),
-                    Forms\Components\Select::make("status")->options([
+                        ->relationship('user', "name")
+                        ->label("User")
+                        ->required(),
+
+                    // Address selection field (now displays combined details including Building Number)
+                    Forms\Components\Select::make("address_id")
+                        ->label("Delivery Address")
+                        ->options(
+                            // Fetches all addresses and formats them for display
+                            Address::all()
+                                ->mapWithKeys(function ($address) {
+                                    return [
+                                        $address->id =>
+                                        'City: ' . $address->city .
+                                            ', Gov: ' . $address->governate .
+                                            ', Street: ' . $address->street .
+                                            ($address->building_no ? ', Bldg No: ' . $address->building_no : '') // Add Building No. if exists
+                                    ];
+                                })
+                                ->toArray()
+                        )
+                        ->required()
+                        ->placeholder('Select a delivery address'),
+
+                    // Note: No separate Building Number text input here as it's now part of the Address dropdown.
+
+                    Forms\Components\Select::make("status")->options([ // Order status dropdown
                         "pending" => EnumsOrderStatusEnum::PENDING->value,
                         "completed" => EnumsOrderStatusEnum::COMPLETED->value,
                         "cancelled" => EnumsOrderStatusEnum::CANCELLED->value,
                     ])->required()->default("pending"),
-                    Forms\Components\Select::make("address_id")
-                        ->relationship('address', "city")->label("city")->required(),
-                    Forms\Components\TextInput::make("points")->numeric()->required()->minvalue(0),
+
+                    Forms\Components\TextInput::make("points")->numeric()->required()->minvalue(0), // Points input
                 ])
             ]);
     }
@@ -77,11 +94,31 @@ class OrderResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make("user.name")->searchable()->sortable()->toggleable(),
-                Tables\Columns\TextColumn::make('status')->label('Status')->sortable(),
-                Tables\Columns\TextColumn::make("points")->sortable()->toggleable(),
-                Tables\Columns\TextColumn::make("address.city")->searchable()->sortable()->toggleable(),
-                Tables\Columns\TextColumn::make('agent.user.name') // جلب اسم الوكيل المرتبط
+                Tables\Columns\TextColumn::make("user.name")
+                    ->searchable()->sortable()->toggleable(),
+                Tables\Columns\TextColumn::make('status')
+                    ->label('Status')->sortable(),
+                Tables\Columns\TextColumn::make("points")
+                    ->sortable()->toggleable(),
+                Tables\Columns\TextColumn::make("address.city")
+                    ->label('Delivery Address Details')
+                    ->description(function (Order $record) {
+                        if ($record->address) {
+                            return 'City: ' . $record->address->city .
+                                ', Gov: ' . $record->address->governate .
+                                ', Street: ' . $record->address->street .
+                                ', Bldg No: ' . $record->address->building_no;
+                        }
+                        return 'No Address';
+                    })
+                    ->searchable([
+                        'address.city',
+                        'address.governate',
+                        'address.street',
+                        'address.building_no'
+                    ]) // Searchable by all parts
+                    ->sortable('address.city'), // Sort by city
+                Tables\Columns\TextColumn::make('agent.user.name')
                     ->label('Agent Name')
                     ->sortable()
                     ->searchable()
@@ -97,7 +134,7 @@ class OrderResource extends Resource
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\DeleteAction::make(),
-                Tables\Actions\Action::make("Receive Order") // Changed action name
+                Tables\Actions\Action::make("Receive Order")
                     ->icon("heroicon-m-check")
                     ->color("success")
                     ->action(function (Order $order) {
@@ -115,7 +152,7 @@ class OrderResource extends Resource
                         $order->agent_id = $agent->id;
                         $order->save();
                         Notification::make()
-                            ->title("Order received") // Changed notification title
+                            ->title("Order received")
                             ->success()
                             ->send();
                     })
@@ -137,7 +174,7 @@ class OrderResource extends Resource
                         $order->status === OrderStatusEnum::PENDING->value &&
                             optional($order->agent)->user_id === auth()->id()
                     ),
-                Tables\Actions\Action::make("Complete Order") // Changed action name
+                Tables\Actions\Action::make("Complete Order")
                     ->icon("heroicon-o-check")
                     ->color("success")
                     ->action(function (Order $order) {
@@ -156,7 +193,7 @@ class OrderResource extends Resource
                         $order->status === OrderStatusEnum::PENDING->value &&
                             optional($order->agent)->user_id === auth()->id()
                     ),
-                Tables\Actions\Action::make("Edit Points") // Changed action name
+                Tables\Actions\Action::make("Edit Points")
                     ->icon("heroicon-m-pencil-square")
                     ->form([
                         Forms\Components\TextInput::make("points")

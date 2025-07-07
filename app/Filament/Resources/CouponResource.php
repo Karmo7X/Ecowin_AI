@@ -60,9 +60,6 @@ class CouponResource extends Resource
                 Forms\Components\TextInput::make("price")
                     ->numeric()->minvalue(0)
                     ->required(),
-
-                // Forms\Components\Select::make("brand_id")
-                //     ->relationship('brand', "name_ar")->label("brand ar"),
                 Forms\Components\Select::make("brand_id")
                     ->relationship('brand', "name_en")->label("brand")->required(),
 
@@ -82,7 +79,6 @@ class CouponResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            // ->query(fn(Builder $query) => $query->whereNull('user_id'))
             ->columns([
                 Tables\Columns\TextColumn::make("code")->searchable()->sortable(),
                 Tables\Columns\TextColumn::make("discount_value")
@@ -90,7 +86,6 @@ class CouponResource extends Resource
                     ->formatStateUsing(fn($state) => $state . '%')
                     ->sortable(),
                 Tables\Columns\TextColumn::make("price")->sortable(),
-                // Tables\Columns\TextColumn::make("brand.name_ar")->searchable()->sortable()->toggleable(),
                 Tables\Columns\TextColumn::make("brand.name_en")->searchable()->sortable()->toggleable(),
                 Tables\Columns\TextColumn::make('expires_at')
                     ->label('Expiration Date')
@@ -100,11 +95,7 @@ class CouponResource extends Resource
 
 
             ])
-            ->filters([
-                // Tables\Filters\Filter::make('Without User')
-                //     ->query(fn(Builder $query) => $query->whereNull('user_id'))
-                //     ->default(),
-            ])
+            ->filters([])
             ->actions([
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make(),

@@ -17,10 +17,10 @@ class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-shopping-cart'; // أيقونة عربة التسوق تناسب المنتجات
+    protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
     protected static ?int $navigationSort = 1;
-    protected static ?string $navigationGroup = 'Store'; // نفس المجموعة لتجميع المنتجات والفئات معًا
-    protected static ?string $navigationLabel = 'Products'; // تصحيح التسمية لتكون بصيغة الجمع
+    protected static ?string $navigationGroup = 'Store';
+    protected static ?string $navigationLabel = 'Products';
     public static function shouldRegisterNavigation(): bool
     {
         return auth()->user()?->role === "admin"; //هام جدا في اخفاء الريسورس عن الايجنت role
@@ -39,11 +39,8 @@ class ProductResource extends Resource
 
                 Forms\Components\Section::make()->schema([
                     Forms\Components\FileUpload::make("image")->directory("products")->image()->imageEditor()->required(),
-                    // Forms\Components\TextInput::make("name_ar")->maxValue(50)->required(),
                     Forms\Components\Hidden::make("name_ar"),
                     Forms\Components\TextInput::make("name_en")->label("Name")->maxValue(50)->required(),
-                    // Forms\Components\Select::make("category_id")
-                    //     ->relationship('category', "name_ar")->label("category ar"),
                     Forms\Components\Select::make("category_id")
                         ->relationship('category', "name_en")->label("Category"),
                     Forms\Components\TextInput::make("price")->numeric()->required()->minvalue(0),
@@ -56,9 +53,7 @@ class ProductResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\ImageColumn::make("image"),
-                // Tables\Columns\TextColumn::make("name_ar")->searchable()->sortable(),
                 Tables\Columns\TextColumn::make("name_en")->label("Name")->searchable()->sortable(),
-                // Tables\Columns\TextColumn::make("category.name_ar")->searchable()->sortable()->toggleable(),
                 Tables\Columns\TextColumn::make("category.name_en")->searchable()->sortable()->toggleable(),
                 Tables\Columns\TextColumn::make("price")->sortable()->toggleable(),
                 //

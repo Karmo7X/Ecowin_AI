@@ -24,10 +24,10 @@ class CategoryResource extends Resource
     protected static string $resource = UserResource::class;
 
     protected static ?string $model = Category::class;
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-group'; // أيقونة التصنيفات
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-group';
     protected static ?int $navigationSort = 1;
-    protected static ?string $navigationGroup = 'Store'; // المجموعة التي تضم التصنيفات والمنتجات
-    protected static ?string $navigationLabel = 'Categories'; // اسم الفئات في القائمة
+    protected static ?string $navigationGroup = 'Store';
+    protected static ?string $navigationLabel = 'Categories';
     public static function shouldRegisterNavigation(): bool
     {
         return auth()->user()?->role === "admin"; //هام جدا في اخفاء الريسورس عن الايجنت role
@@ -47,7 +47,6 @@ class CategoryResource extends Resource
                     ->schema([
                         Forms\Components\Section::make()
                             ->schema([
-                                // Forms\Components\TextInput::make("name_ar")->maxValue(50)->required(),
                                 Forms\Components\Hidden::make("name_ar"),
                                 Forms\Components\TextInput::make("name_en")->label("Name")->maxValue(50)->required(),
                                 Forms\Components\FileUpload::make('image')
@@ -69,7 +68,6 @@ class CategoryResource extends Resource
             ->columns([
 
                 Tables\Columns\ImageColumn::make("image"),
-                // Tables\Columns\TextColumn::make("name_ar")->searchable()->sortable(),
                 Tables\Columns\TextColumn::make("name_en")->label("Name")->searchable()->sortable(),
                 //
             ])
