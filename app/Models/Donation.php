@@ -22,5 +22,10 @@ class Donation extends Model
     {
         return $this->hasMany(DonationImage::class);
     }
+    public function agent()
+    {
+        return $this->belongsTo(Agent::class);
+    }
+
 
 }

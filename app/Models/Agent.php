@@ -24,8 +24,14 @@ class Agent extends Model
     {
         return $this->hasMany(Order::class);
     }
+
     public function currentOrder()
     {
         return $this->belongsTo(Order::class, 'order_id');
     }
+
+    public function donations()
+{
+    return $this->hasMany(Donation::class);
+}
 }

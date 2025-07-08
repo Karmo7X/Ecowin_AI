@@ -49,7 +49,6 @@ class User extends Authenticatable implements
     public function canAccessPanel(Panel $panel): bool
     {
         if ($panel->getId() === 'dashboard') {
-            // return str_ends_with($this->email, '@gmail.com');
             return $this->role === "admin" || $this->role === "agent";
         }
 
