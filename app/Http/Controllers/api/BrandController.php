@@ -22,13 +22,12 @@ class BrandController extends Controller
         ], 404);
     }
 
-    // استدعاء accessor مباشرة
     $data = $brands->map(function ($brand) {
         return [
             'id' => $brand->id,
             'name' => $brand->name,
-            'brand_image' => $brand->brand_image ? url('storage/' . $brand->brand_image): null, 
-            
+            'brand_image' => $brand->brand_image ? url('storage/' . $brand->brand_image): null,
+
         ];
     });
 

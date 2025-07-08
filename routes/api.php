@@ -53,7 +53,6 @@ Route::group(['middleware' => ['auth:api', 'throttle:60,1']], function () {
 Route::group(['middleware' => ['auth:api','changelanguage','role:user', 'throttle:60,1']], function () {
     // Users specific routes here...
 
-
     //category api
     Route::get('/categories', [CategoryController::class, 'index']);
     // products api
